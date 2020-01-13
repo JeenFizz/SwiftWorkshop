@@ -1,0 +1,190 @@
+fileFormatVersion: 2
+guid: fd865c462048f5f4fa7682f2c465868d
+timeCreated: 1531841195
+licenseType: Free
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: Solide54
+    100002: Solide55
+    100004: Solide56
+    100006: Solide57
+    100008: Solide58
+    100010: Solide59
+    100012: Solide60
+    100014: Solide61
+    100016: Solide62
+    100018: Solide63
+    100020: Solide64
+    100022: Solide65
+    100024: Solide66
+    100026: Solide67
+    100028: Solide68
+    100030: Solide69
+    100032: Solide70
+    100034: Solide71
+    100036: Solide72
+    100038: //RootNode
+    400000: Solide54
+    400002: Solide55
+    400004: Solide56
+    400006: Solide57
+    400008: Solide58
+    400010: Solide59
+    400012: Solide60
+    400014: Solide61
+    400016: Solide62
+    400018: Solide63
+    400020: Solide64
+    400022: Solide65
+    400024: Solide66
+    400026: Solide67
+    400028: Solide68
+    400030: Solide69
+    400032: Solide70
+    400034: Solide71
+    400036: Solide72
+    400038: //RootNode
+    2100000: 192,192,255
+    2100002: 198,193,188
+    2100004: 0,0,255
+    2100006: 203,210,239
+    2100008: 255,255,255
+    2100010: 68,68,68
+    2300000: Solide54
+    2300002: Solide55
+    2300004: Solide56
+    2300006: Solide57
+    2300008: Solide58
+    2300010: Solide59
+    2300012: Solide60
+    2300014: Solide61
+    2300016: Solide62
+    2300018: Solide63
+    2300020: Solide64
+    2300022: Solide65
+    2300024: Solide66
+    2300026: Solide67
+    2300028: Solide68
+    2300030: Solide69
+    2300032: Solide70
+    2300034: Solide71
+    2300036: Solide72
+    3300000: Solide54
+    3300002: Solide55
+    3300004: Solide56
+    3300006: Solide57
+    3300008: Solide58
+    3300010: Solide59
+    3300012: Solide60
+    3300014: Solide61
+    3300016: Solide62
+    3300018: Solide63
+    3300020: Solide64
+    3300022: Solide65
+    3300024: Solide66
+    3300026: Solide67
+    3300028: Solide68
+    3300030: Solide69
+    3300032: Solide70
+    3300034: Solide71
+    3300036: Solide72
+    4300000: Solide54
+    4300002: Solide55
+    4300004: Solide56
+    4300006: Solide57
+    4300008: Solide58
+    4300010: Solide59
+    4300012: Solide60
+    4300014: Solide61
+    4300016: Solide62
+    4300018: Solide63
+    4300020: Solide64
+    4300022: Solide65
+    4300024: Solide66
+    4300026: Solide67
+    4300028: Solide68
+    4300030: Solide69
+    4300032: Solide70
+    4300034: Solide71
+    4300036: Solide72
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

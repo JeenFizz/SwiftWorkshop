@@ -1,0 +1,186 @@
+fileFormatVersion: 2
+guid: eadc24b893c465942ab414a4ccc91971
+timeCreated: 1529591310
+licenseType: Free
+ModelImporter:
+  serializedVersion: 22
+  fileIDToRecycleName:
+    100000: 3DGeom~131
+    100002: 3DGeom~132
+    100004: 3DGeom~133
+    100006: 3DGeom~134
+    100008: 3DGeom~135
+    100010: 3DGeom~136
+    100012: 3DGeom~137
+    100014: 3DGeom~138
+    100016: 3DGeom~181
+    100018: 3DGeom~182
+    100020: 3DGeom~225
+    100022: 3DGeom~226
+    100024: 3DGeom~227
+    100026: Assemblage1
+    100028: Body_1
+    100030: Body_1_2
+    100032: Body_1_3
+    100034: Commande num_rique Nico-1
+    100036: //RootNode
+    100038: Default Camera 1
+    100040: Ground
+    100042: Porte CNC Nico-1
+    100044: Porte droite CNC Nico-1
+    400000: 3DGeom~131
+    400002: 3DGeom~132
+    400004: 3DGeom~133
+    400006: 3DGeom~134
+    400008: 3DGeom~135
+    400010: 3DGeom~136
+    400012: 3DGeom~137
+    400014: 3DGeom~138
+    400016: 3DGeom~181
+    400018: 3DGeom~182
+    400020: 3DGeom~225
+    400022: 3DGeom~226
+    400024: 3DGeom~227
+    400026: Assemblage1
+    400028: Body_1
+    400030: Body_1_2
+    400032: Body_1_3
+    400034: Commande num_rique Nico-1
+    400036: //RootNode
+    400038: Default Camera 1
+    400040: Ground
+    400042: Porte CNC Nico-1
+    400044: Porte droite CNC Nico-1
+    2000000: Default Camera 1
+    2100000: Mtl1
+    2100002: texture
+    2100004: texture5
+    2100006: Mtl6
+    2100008: Mtl2
+    2100010: Mtl3
+    2100012: Mtl4
+    2100014: Mtl
+    2100016: Mtl8
+    2100018: Mtl9
+    2100020: Mtla
+    2100022: Mtl10
+    2100024: Mtlb
+    2300000: 3DGeom~131
+    2300002: 3DGeom~132
+    2300004: 3DGeom~133
+    2300006: 3DGeom~134
+    2300008: 3DGeom~135
+    2300010: 3DGeom~136
+    2300012: 3DGeom~137
+    2300014: 3DGeom~138
+    2300016: 3DGeom~181
+    2300018: 3DGeom~182
+    2300020: 3DGeom~225
+    2300022: 3DGeom~226
+    2300024: 3DGeom~227
+    3300000: 3DGeom~131
+    3300002: 3DGeom~132
+    3300004: 3DGeom~133
+    3300006: 3DGeom~134
+    3300008: 3DGeom~135
+    3300010: 3DGeom~136
+    3300012: 3DGeom~137
+    3300014: 3DGeom~138
+    3300016: 3DGeom~181
+    3300018: 3DGeom~182
+    3300020: 3DGeom~225
+    3300022: 3DGeom~226
+    3300024: 3DGeom~227
+    4300000: 3DGeom~131
+    4300002: 3DGeom~132
+    4300004: 3DGeom~133
+    4300006: 3DGeom~134
+    4300008: 3DGeom~135
+    4300010: 3DGeom~136
+    4300012: 3DGeom~137
+    4300014: 3DGeom~138
+    4300016: 3DGeom~181
+    4300018: 3DGeom~182
+    4300020: 3DGeom~225
+    4300022: 3DGeom~226
+    4300024: 3DGeom~227
+  externalObjects: {}
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+    materialLocation: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    importAnimatedCustomProperties: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    preserveHierarchy: 0
+    indexFormat: 0
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 0
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
