@@ -7,12 +7,16 @@ public class ControllerInput : MonoBehaviour
 	public static event OnGrabPressed OnGrabPressedEvent;
 	public delegate void OnGrabReleased(GameObject controller);
 	public static event OnGrabReleased OnGrabReleasedEvent;
+	public Transform cameraRig;
+	public float rotationSpeed = 120.0f;
 
 	private SteamVR_Behaviour_Pose behaviourPose;
 	private SteamVR_Input_Sources inputSource;
-	private GameObject selectedObject;
 	private FixedJoint joint;
 	private ControllerPointer contPointer;
+	private bool isTurningLeft = false;
+	private bool isTurningRight = false;
+	private GrabPointer grabPointer;
 
 	void Awake()
 	{
@@ -20,18 +24,23 @@ public class ControllerInput : MonoBehaviour
 		inputSource = behaviourPose.inputSource;
 	}
 
+	private void Start()
+	{
+		grabPointer = GetComponent<GrabPointer>();
+	}
+
 	void Update()
 	{
 		if (SteamVR_Actions._default.GrabPinch.GetStateDown(inputSource))
 		{
-			if (selectedObject != null)
+			if (grabPointer.targetedObject != null)
 				GrabSelectedObject();
 
 			OnGrabPressedEvent?.Invoke(gameObject);
 		}
 		if (SteamVR_Actions._default.GrabPinch.GetStateUp(inputSource))
 		{
-			if (selectedObject != null)
+			if (grabPointer.targetedObject != null)
 				UngrabSelectedObject();
 
 			OnGrabReleasedEvent?.Invoke(gameObject);
@@ -41,18 +50,23 @@ public class ControllerInput : MonoBehaviour
 			TeleportPressed();
 		if (SteamVR_Actions._default.Teleport.GetStateUp(inputSource))
 			TeleportReleased();
-	}
 
-	void OnTriggerEnter(Collider other)
-	{
-		if (other.GetComponent<GrabbableObject>())
-			selectedObject = other.gameObject;
-	}
+		if (SteamVR_Actions._default.SnapTurnLeft.GetStateDown(inputSource))
+			isTurningLeft = true;
 
-	void OnTriggerExit(Collider other)
-	{
-		if (other.gameObject == selectedObject)
-			selectedObject = null;
+		if (SteamVR_Actions._default.SnapTurnLeft.GetStateUp(inputSource))
+			isTurningLeft = false;
+
+		if (SteamVR_Actions._default.SnapTurnRight.GetStateDown(inputSource))
+			isTurningRight = true;
+
+		if (SteamVR_Actions._default.SnapTurnRight.GetStateUp(inputSource))
+			isTurningRight = false;
+
+		if (isTurningLeft)
+			TurnLeft();
+		if (isTurningRight)
+			TurnRight();
 	}
 
 	void GrabSelectedObject()
@@ -60,7 +74,7 @@ public class ControllerInput : MonoBehaviour
 		if (joint == null)
 		{
 			joint = gameObject.AddComponent<FixedJoint>();
-			joint.connectedBody = selectedObject.GetComponent<Rigidbody>();
+			joint.connectedBody = grabPointer.targetedObject.GetComponent<Rigidbody>();
 			joint.breakForce = 20000;
 			joint.breakTorque = 20000;
 		}
@@ -72,8 +86,6 @@ public class ControllerInput : MonoBehaviour
 		{
 			joint.connectedBody = null;
 			Destroy(joint);
-			selectedObject.GetComponent<Rigidbody>().velocity = behaviourPose.GetVelocity();
-			selectedObject.GetComponent<Rigidbody>().angularVelocity = behaviourPose.GetAngularVelocity();
 		}
 	}
 
@@ -95,5 +107,16 @@ public class ControllerInput : MonoBehaviour
 			contPointer.DesactivatePointer();
 			Destroy(contPointer);
 		}
+	}
+
+	void TurnRight()
+	{
+		cameraRig.transform.Rotate(new Vector3(0, rotationSpeed, 0) * Time.deltaTime);
+	}
+
+	void TurnLeft()
+	{
+		cameraRig.transform.Rotate(new Vector3(0, -rotationSpeed, 0) * Time.deltaTime);
+
 	}
 }
