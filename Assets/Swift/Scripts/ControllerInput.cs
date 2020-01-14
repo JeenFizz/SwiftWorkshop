@@ -12,10 +12,11 @@ public class ControllerInput : MonoBehaviour
 
 	private SteamVR_Behaviour_Pose behaviourPose;
 	private SteamVR_Input_Sources inputSource;
-	private FixedJoint joint;
 	private ControllerPointer contPointer;
 	private bool isTurningLeft = false;
 	private bool isTurningRight = false;
+	private bool isPulling = false;
+	private bool isPushing = false;
 	private GrabPointer grabPointer;
 
 	void Awake()
@@ -34,28 +35,64 @@ public class ControllerInput : MonoBehaviour
 		if (SteamVR_Actions._default.GrabPinch.GetStateDown(inputSource))
 		{
 			if (grabPointer.targetedObject != null)
-				GrabSelectedObject();
+				grabPointer.GrabSelectedObject();
 
 			OnGrabPressedEvent?.Invoke(gameObject);
 		}
 		if (SteamVR_Actions._default.GrabPinch.GetStateUp(inputSource))
 		{
-			if (grabPointer.targetedObject != null)
-				UngrabSelectedObject();
+			grabPointer.UngrabSelectedObject();
 
 			OnGrabReleasedEvent?.Invoke(gameObject);
 		}
 
 		if (SteamVR_Actions._default.Teleport.GetStateDown(inputSource))
-			TeleportPressed();
+		{
+			if(grabPointer.grabbedObject == null)
+			{
+				grabPointer.DesactivatePointer();
+				TeleportPressed();
+			}
+			else
+			{
+				isPushing = true;
+			}
+		}
 		if (SteamVR_Actions._default.Teleport.GetStateUp(inputSource))
-			TeleportReleased();
+		{
+			if (grabPointer.grabbedObject == null)
+			{
+				TeleportReleased();
+				grabPointer.ActivatePointer();
+			}
+			isPushing = false;
+		}
+
+		if (SteamVR_Actions._default.JoystickDown.GetStateDown(inputSource))
+			if (grabPointer.grabbedObject != null)
+				isPulling = true;
+		if (SteamVR_Actions._default.JoystickDown.GetStateUp(inputSource))
+			isPulling = false;
+
+		if (isPulling)
+		{
+			grabPointer.Pull();
+		}
+
+		else if (isPushing)
+		{
+			grabPointer.Push();
+		}
+
+
 
 		if (SteamVR_Actions._default.SnapTurnLeft.GetStateDown(inputSource))
 			isTurningLeft = true;
 
 		if (SteamVR_Actions._default.SnapTurnLeft.GetStateUp(inputSource))
 			isTurningLeft = false;
+
+
 
 		if (SteamVR_Actions._default.SnapTurnRight.GetStateDown(inputSource))
 			isTurningRight = true;
@@ -65,29 +102,10 @@ public class ControllerInput : MonoBehaviour
 
 		if (isTurningLeft)
 			TurnLeft();
-		if (isTurningRight)
+		else if (isTurningRight)
 			TurnRight();
 	}
 
-	void GrabSelectedObject()
-	{
-		if (joint == null)
-		{
-			joint = gameObject.AddComponent<FixedJoint>();
-			joint.connectedBody = grabPointer.targetedObject.GetComponent<Rigidbody>();
-			joint.breakForce = 20000;
-			joint.breakTorque = 20000;
-		}
-	}
-
-	void UngrabSelectedObject()
-	{
-		if (joint != null)
-		{
-			joint.connectedBody = null;
-			Destroy(joint);
-		}
-	}
 
 	void TeleportPressed()
 	{
@@ -104,9 +122,9 @@ public class ControllerInput : MonoBehaviour
 		{
 			GameObject cameraRig = GameObject.Find("[CameraRig]");
 			cameraRig.transform.position = contPointer.TargetPosition;
-			contPointer.DesactivatePointer();
-			Destroy(contPointer);
 		}
+		contPointer.DesactivatePointer();
+		Destroy(contPointer);
 	}
 
 	void TurnRight()

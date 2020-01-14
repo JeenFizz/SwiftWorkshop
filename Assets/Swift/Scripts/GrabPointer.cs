@@ -5,9 +5,16 @@ public class GrabPointer : MonoBehaviour
     public float thickness = 0.002f;
     public float length = 100f;
     public GameObject targetedObject;
+    public GameObject grabbedObject;
+    public GameObject sphere;
+    public float pullSpeed = 1f;
 
 
     Color color;
+
+    private FixedJoint joint;
+
+
 
     GameObject holder;
     GameObject pointer;
@@ -27,7 +34,7 @@ public class GrabPointer : MonoBehaviour
     }
 
     // Use this for initialization
-    void Start()
+    void Awake()
     {
         ActivatePointer();
     }
@@ -66,6 +73,10 @@ public class GrabPointer : MonoBehaviour
 
     void Update()
     {
+        if (holder == null || pointer == null || cursor == null)
+        {
+            return;
+        }
         Ray raycast = new Ray(transform.position, transform.forward);
 
         RaycastHit hitObject;
@@ -132,5 +143,42 @@ public class GrabPointer : MonoBehaviour
         Destroy(holder);
         Destroy(pointer);
         Destroy(cursor);
+    }
+
+    public void GrabSelectedObject()
+    {
+        sphere.SetActive(true);
+        sphere.transform.position = cursor.transform.position;
+        if (joint == null)
+        {
+            grabbedObject = targetedObject;
+            /*joint = sphere.AddComponent<FixedJoint>();
+            joint.connectedBody = targetedObject.GetComponent<Rigidbody>();
+            joint.breakForce = 20000;
+            joint.breakTorque = 20000;*/
+        }
+    }
+
+    public void UngrabSelectedObject()
+    {
+        if (joint != null)
+        {
+            grabbedObject = null;
+            //joint.connectedBody = null;
+            //Destroy(joint);
+        }
+        sphere.SetActive(false);
+    }
+    public void Pull()
+    {
+        Rigidbody sphereRb = sphere.GetComponent<Rigidbody>();
+        sphereRb.AddForce((sphere.transform.position - transform.position).magnitude * transform.forward * -pullSpeed * Time.deltaTime, ForceMode.VelocityChange);
+    }
+
+    public void Push()
+    {
+        Rigidbody sphereRb = sphere.GetComponent<Rigidbody>();
+        sphereRb.AddForce((sphere.transform.position - transform.position).magnitude * transform.forward * pullSpeed * Time.deltaTime, ForceMode.VelocityChange);
+
     }
 }
