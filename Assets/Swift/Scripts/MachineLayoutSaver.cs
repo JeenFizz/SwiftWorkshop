@@ -46,7 +46,7 @@ public class MachineLayoutSaver : MonoBehaviour
 
     void CheckSave()
     {
-        if (!Input.GetKeyDown("s")) return;
+        if (!Input.GetKeyDown("m")) return;
 
         IEnumerable<MachineData> machineInfos = machines
             .Aggregate(new List<MachineData>() as IEnumerable<MachineData>, (prev, next) =>
