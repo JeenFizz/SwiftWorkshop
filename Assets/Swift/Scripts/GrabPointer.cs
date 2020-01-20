@@ -9,23 +9,19 @@ public class GrabPointer : MonoBehaviour
     public GameObject sphere;
     public float pullSpeed = 1f;
 
-    float grabbedX = 0f;
-    float grabbedZ = 0f;
-    float grabbedY = 0f;
+    private GameObject holder;
+    private GameObject pointer;
+    private GameObject cursor;
 
-    Color color;
+    private Vector3 cursorScale = new Vector3(0.05f, 0.05f, 0.05f);
+    private float contactDistance = 0f;
+    private Transform contactTarget = null;
 
-    private FixedJoint joint;
-
-    float beamLength = 0f;
-
-    GameObject holder;
-    GameObject pointer;
-    GameObject cursor;
-
-    Vector3 cursorScale = new Vector3(0.05f, 0.05f, 0.05f);
-    float contactDistance = 0f;
-    Transform contactTarget = null;
+    private Color color = Color.black;
+    private float grabbedX = 0f;
+    private float grabbedZ = 0f;
+    private float grabbedY = 0f;
+    public float rotationSpeed = 120.0f;
 
     void SetPointerTransform(float setLength, float setThicknes)
     {
@@ -36,7 +32,6 @@ public class GrabPointer : MonoBehaviour
         cursor.transform.localPosition = new Vector3(0f, 0f, setLength);
     }
 
-    // Use this for initialization
     void Awake()
     {
         ActivatePointer();
@@ -77,9 +72,8 @@ public class GrabPointer : MonoBehaviour
     void Update()
     {
         if (holder == null || pointer == null || cursor == null)
-        {
             return;
-        }
+
         Ray raycast = new Ray(transform.position, transform.forward);
 
         RaycastHit hitObject;
@@ -93,12 +87,17 @@ public class GrabPointer : MonoBehaviour
             }
             else
             {
-                UpdateColor(Color.yellow);
                 targetedObject = null;
+                UpdateColor(Color.yellow);
             }
         }
+        else
+        {
+            targetedObject = null;
+            UpdateColor(Color.yellow);
+        }
 
-        beamLength = GetBeamLength(rayHit, hitObject);
+        float beamLength = GetBeamLength(rayHit, hitObject);
         SetPointerTransform(beamLength, thickness);
         if (grabbedObject != null)
             grabbedObject.transform.rotation = (new Quaternion(grabbedX, grabbedY, grabbedZ, 0));
@@ -141,7 +140,6 @@ public class GrabPointer : MonoBehaviour
         cursor.layer = 2;
         holder.transform.localRotation = new Quaternion(0, 0, 0, 0);
         SetPointerTransform(length, thickness);
-
     }
 
     public void DesactivatePointer()
@@ -153,62 +151,61 @@ public class GrabPointer : MonoBehaviour
 
     public void GrabSelectedObject()
     {
-        /*sphere.SetActive(true);
-        sphere.transform.position = cursor.transform.position;*/
-
-        grabbedObject = targetedObject;
-
-        /*if (joint == null)
+        if (targetedObject != null)
         {
-            joint = sphere.AddComponent<FixedJoint>();
-            joint.connectedBody = targetedObject.GetComponent<Rigidbody>();
-            joint.breakForce = 20000;
-            joint.breakTorque = 20000;
-        }*/
+            grabbedObject = targetedObject;
+            grabbedObject.transform.parent = gameObject.transform;
 
-        grabbedObject.transform.parent = gameObject.transform;
-
-        Quaternion grabbedRotation = grabbedObject.transform.rotation;
-        grabbedX = grabbedRotation.x;
-        grabbedZ = grabbedRotation.z;
-        grabbedY = grabbedRotation.y;
-        grabbedObject.GetComponent<Rigidbody>().isKinematic = true;
+            Quaternion identity = Quaternion.identity;
+            Quaternion grabbedRotation = grabbedObject.transform.rotation;
+            grabbedX = identity.x;
+            grabbedY = grabbedRotation.y;
+            grabbedZ = identity.z;
+            grabbedObject.GetComponent<Rigidbody>().isKinematic = true;
+        }
     }
 
     public void UngrabSelectedObject()
     {
-        if (joint != null)
+        if (grabbedObject != null)
         {
+            grabbedObject.GetComponent<Rigidbody>().isKinematic = false;
+            grabbedObject.transform.parent = null;
             grabbedObject = null;
-            joint.connectedBody = null;
-            if (joint != null)
-                Destroy(joint);
         }
-        grabbedObject.transform.parent = null;
-        grabbedObject.GetComponent<Rigidbody>().isKinematic = false;
-        grabbedObject = null;
-
-
-        //sphere.SetActive(false);
     }
+
     public void Pull()
     {
-        /*Rigidbody sphereRb = sphere.GetComponent<Rigidbody>();
-        sphereRb.AddForce((sphere.transform.position - transform.position).magnitude * transform.forward * -pullSpeed * Time.deltaTime, ForceMode.Impulse);*/
-        Rigidbody grabbedRb = grabbedObject.GetComponent<Rigidbody>();
-        grabbedRb.MovePosition((sphere.transform.position - transform.position).magnitude * transform.forward * -pullSpeed * Time.deltaTime);
-
-        //grabbedRb.AddForce((grabbedObject.transform.position - transform.position).magnitude * transform.forward * -pullSpeed * Time.deltaTime);
-
+        if (grabbedObject != null)
+        {
+            Rigidbody grabbedRb = grabbedObject.GetComponent<Rigidbody>();
+            grabbedRb.MovePosition(grabbedRb.transform.position + ((grabbedRb.transform.position - transform.position).magnitude * transform.forward * -pullSpeed * Time.deltaTime));
+        }
     }
 
     public void Push()
     {
-       /* Rigidbody sphereRb = sphere.GetComponent<Rigidbody>();
-        sphereRb.AddForce((sphere.transform.position - transform.position).magnitude * transform.forward * pullSpeed * Time.deltaTime, ForceMode.Impulse);
-        *//*Rigidbody grabbedRb = grabbedObject.GetComponent<Rigidbody>();
-        grabbedRb.AddForce((grabbedObject.transform.position - transform.position).magnitude * transform.forward * -pullSpeed * Time.deltaTime, ForceMode.Impulse);*/
-
+        if (grabbedObject != null)
+        {
+            Rigidbody grabbedRb = grabbedObject.GetComponent<Rigidbody>();
+            grabbedRb.MovePosition(grabbedRb.transform.position + ((grabbedRb.transform.position - transform.position).magnitude * transform.forward * pullSpeed * Time.deltaTime));
+        }
     }
 
+    public void TurnRight()
+    {
+        //grabbedObject.transform.Rotate(new Vector3(0, rotationSpeed, 0) * Time.deltaTime);
+        //Quaternion grabbedRotation = grabbedObject.transform.rotation;
+        //grabbedY = grabbedRotation.y;
+        grabbedY += rotationSpeed * Time.deltaTime;
+    }
+
+    public void TurnLeft()
+    {
+        //grabbedObject.transform.Rotate(new Vector3(0, -rotationSpeed, 0) * Time.deltaTime);
+        //Quaternion grabbedRotation = grabbedObject.transform.rotation;
+        //grabbedY = grabbedRotation.y;
+        grabbedY -= rotationSpeed * Time.deltaTime;
+    }
 }
