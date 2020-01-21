@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
+using Photon.Pun;
 
-public class GrabPointer : MonoBehaviour
+public class GrabPointer : MonoBehaviourPunCallbacks
 {
     public float thickness = 0.002f;
     public float length = 100f;
@@ -34,7 +35,8 @@ public class GrabPointer : MonoBehaviour
 
     void Awake()
     {
-        ActivatePointer();
+        if(photonView.IsMine)
+            ActivatePointer();
     }
 
     float GetBeamLength(bool bHit, RaycastHit hit)
@@ -180,7 +182,7 @@ public class GrabPointer : MonoBehaviour
         if (grabbedObject != null)
         {
             Rigidbody grabbedRb = grabbedObject.GetComponent<Rigidbody>();
-            grabbedRb.MovePosition(grabbedRb.transform.position + ((grabbedRb.transform.position - transform.position).magnitude * transform.forward * -pullSpeed * Time.deltaTime));
+            grabbedRb.transform.position = (grabbedRb.transform.position + ((grabbedRb.transform.position - transform.position).magnitude * transform.forward * -pullSpeed * Time.deltaTime));
         }
     }
 
@@ -189,7 +191,7 @@ public class GrabPointer : MonoBehaviour
         if (grabbedObject != null)
         {
             Rigidbody grabbedRb = grabbedObject.GetComponent<Rigidbody>();
-            grabbedRb.MovePosition(grabbedRb.transform.position + ((grabbedRb.transform.position - transform.position).magnitude * transform.forward * pullSpeed * Time.deltaTime));
+            grabbedRb.transform.position = (grabbedRb.transform.position + ((grabbedRb.transform.position - transform.position).magnitude * transform.forward * pullSpeed * Time.deltaTime));
         }
     }
 
