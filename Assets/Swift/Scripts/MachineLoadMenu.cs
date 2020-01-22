@@ -16,7 +16,6 @@ public class MachineLoadMenu : MonoBehaviour
 
         foreach(string save in Directory.GetFiles(saveDir, "*.json").Reverse())
         {
-            Debug.Log(save);
             var row = Instantiate(SaveRow, gameObject.transform);
             row.transform.Find("SaveLabel").GetComponent<UnityEngine.UI.Text>().text = save.Substring(saveDir.Length);
             row.transform.Find("Load").GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => {

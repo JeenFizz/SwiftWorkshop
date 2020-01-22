@@ -84,10 +84,10 @@ public class ProductFlowChart : MonoBehaviour
     {
         while (true)
         {
-            yield return new WaitForSeconds(productInfo.coef);
+            yield return new WaitForSeconds(5 / productInfo.coef);
 
             GameObject machine = GameObject.Find(productInfo.machines.First());
-            GameObject productObject = Instantiate(ProdutObject, machine.transform);
+            GameObject productObject = Instantiate(ProdutObject, machine.transform.position, new Quaternion(), transform);
             productObject.GetComponent<MeshRenderer>().material.color = productInfo.color;
 
             foreach(TextMesh tmesh in productObject.transform.GetComponentsInChildren<TextMesh>()) tmesh.text = productInfo.name;

@@ -31,12 +31,12 @@ public class PowerOutlet : MonoBehaviour
     {
         if (new string[] { "P", "T", "G", "F" }.Contains(other.tag))
         {
-            Debug.Log(other.tag);
             foreach (Transform border in other.transform.Find("FreeBorder"))
             {
                 MeshRenderer mesh = border.GetComponent<MeshRenderer>();
                 mesh.material.color = enter ? Color.cyan : new Color() { a=.5f, r=.853f, g=.512f, b=0 };
             }
+            other.transform.Find("PowerLight").GetComponent<Light>().enabled = enter;
         }
     }
 }
