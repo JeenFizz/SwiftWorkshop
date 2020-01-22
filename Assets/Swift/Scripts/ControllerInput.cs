@@ -196,8 +196,7 @@ public class ControllerInput : MonoBehaviour
 		if (contPointer != null)
 		{
 			if (contPointer.CanTeleport)
-				cameraRig.position = contPointer.TargetPosition;
-
+				transform.parent.position = contPointer.TargetPosition;
 			contPointer.DesactivatePointer();
 			Destroy(contPointer);
 		}
