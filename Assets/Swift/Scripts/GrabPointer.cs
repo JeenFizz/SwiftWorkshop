@@ -37,6 +37,7 @@ public class GrabPointer : MonoBehaviourPunCallbacks
     {
         if(photonView.IsMine)
             ActivatePointer();
+        
     }
 
     float GetBeamLength(bool bHit, RaycastHit hit)
@@ -155,15 +156,33 @@ public class GrabPointer : MonoBehaviourPunCallbacks
     {
         if (targetedObject != null)
         {
-            grabbedObject = targetedObject;
-            grabbedObject.transform.parent = gameObject.transform;
+            PhotonView grabbedObjectView = targetedObject.GetComponent<PhotonView>();
+            if (grabbedObjectView.Owner == PhotonNetwork.LocalPlayer)
+            {
+                grabbedObject = targetedObject;
+                grabbedObject.transform.parent = gameObject.transform;
 
-            Quaternion identity = Quaternion.identity;
-            Quaternion grabbedRotation = grabbedObject.transform.rotation;
-            grabbedX = identity.x;
-            grabbedY = grabbedRotation.y;
-            grabbedZ = identity.z;
-            grabbedObject.GetComponent<Rigidbody>().isKinematic = true;
+                Quaternion identity = Quaternion.identity;
+                Quaternion grabbedRotation = grabbedObject.transform.rotation;
+                grabbedX = identity.x;
+                grabbedY = grabbedRotation.y;
+                grabbedZ = identity.z;
+                grabbedObject.GetComponent<Rigidbody>().isKinematic = true;
+            }
+            else
+            {
+                grabbedObjectView.RequestOwnership();
+                grabbedObject = targetedObject;
+                grabbedObject.transform.parent = gameObject.transform;
+
+                Quaternion identity = Quaternion.identity;
+                Quaternion grabbedRotation = grabbedObject.transform.rotation;
+                grabbedX = identity.x;
+                grabbedY = grabbedRotation.y;
+                grabbedZ = identity.z;
+                grabbedObject.GetComponent<Rigidbody>().isKinematic = true;
+            }
+            
         }
     }
 

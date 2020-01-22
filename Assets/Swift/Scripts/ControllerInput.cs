@@ -110,8 +110,8 @@ public class ControllerInput : MonoBehaviour
 		if (contPointer != null)
 		{
 			if (contPointer.CanTeleport)
-				GameObject.Find("[CameraRig]").transform.position = contPointer.TargetPosition;
-
+				//GameObject.Find("[CameraRigMultiuser]").transform.position = contPointer.TargetPosition;
+				transform.parent.position = contPointer.TargetPosition;
 			contPointer.DesactivatePointer();
 			Destroy(contPointer);
 		}
