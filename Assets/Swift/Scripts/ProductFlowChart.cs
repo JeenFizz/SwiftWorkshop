@@ -4,13 +4,14 @@ using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
 
-public struct ProductInfo
+public class ProductInfo
 {
     public string name;
     public Color color;
     public List<string> machines;
     public int coef;
     public GameObject ui;
+    public bool visible = false;
 }
 
 public class ProductFlowChart : MonoBehaviour
@@ -31,6 +32,13 @@ public class ProductFlowChart : MonoBehaviour
     public GameObject ProdutObject;
     private GameObject ProductPanel;
     public GameObject ProductInterface;
+    private Dictionary<string, bool> ProductVisibility = new Dictionary<string, bool>() {
+        { "A", true },
+        { "B", true },
+        { "C", true },
+        { "D", true },
+        { "E", true },
+    };
 
     // Start is called before the first frame update
     void Start()
@@ -44,6 +52,18 @@ public class ProductFlowChart : MonoBehaviour
             pInfo.ui = pInterface;
 
             pInterface.transform.Find("VisibilityButton").GetComponent<Image>().color = pInfo.color;
+            pInterface.transform.Find("VisibilityButton").GetComponent<Button>().onClick.AddListener(() =>
+            {
+                ProductVisibility[pInfo.name] = !ProductVisibility[pInfo.name];
+
+                if(!ProductVisibility[pInfo.name])
+                {
+                    foreach (var p in CurrentProducts.Where(p => p.type == pInfo.name)) Destroy(p.obj);
+                    CurrentProducts = CurrentProducts.Where(p => p.type != pInfo.name).ToList();
+                }
+
+                pInterface.transform.Find("VisibilityButton").transform.Find("VisibilityLabel").GetComponent<Text>().text = ProductVisibility[pInfo.name] ? "Hide" : "Show";
+            });
             pInterface.transform.Find("PathLabel").GetComponent<Text>().text = pInfo.machines.Aggregate("", (prev, next) => prev + " > " + next);
             pInterface.transform.Find("CoefLabel").GetComponent<Text>().text = pInfo.coef.ToString();
 
@@ -86,14 +106,17 @@ public class ProductFlowChart : MonoBehaviour
         {
             yield return new WaitForSeconds(5 / productInfo.coef);
 
-            GameObject machine = GameObject.Find(productInfo.machines.First());
-            GameObject productObject = Instantiate(ProdutObject, machine.transform.position, new Quaternion(), transform);
-            productObject.GetComponent<MeshRenderer>().material.color = productInfo.color;
+            if (ProductVisibility[productInfo.name])
+            {
+                GameObject machine = GameObject.Find(productInfo.machines.First());
+                GameObject productObject = Instantiate(ProdutObject, machine.transform.position, new Quaternion(), transform);
+                productObject.GetComponent<MeshRenderer>().material.color = productInfo.color;
 
-            foreach(TextMesh tmesh in productObject.transform.GetComponentsInChildren<TextMesh>()) tmesh.text = productInfo.name;
+                foreach (TextMesh tmesh in productObject.transform.GetComponentsInChildren<TextMesh>()) tmesh.text = productInfo.name;
 
-            ProductCountChange(productInfo.name, 1);
-            CurrentProducts.Add((productInfo.machines.ToList(), productObject, productInfo.name));
+                ProductCountChange(productInfo.name, 1);
+                CurrentProducts.Add((productInfo.machines.ToList(), productObject, productInfo.name));
+            }
         }
     }
 
