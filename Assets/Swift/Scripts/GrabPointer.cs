@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
+using Photon.Pun;
 
-public class GrabPointer : MonoBehaviour
+public class GrabPointer : MonoBehaviourPunCallbacks
 {
+
 	public float thickness = 0.002f;
 	public float length = 100f;
 	public GameObject targetedObject;
@@ -23,6 +25,16 @@ public class GrabPointer : MonoBehaviour
 	private float yaw2 = 0.0f;
 	private float mult = 0.0f;
 
+    void Awake()
+    {
+        if(photonView.IsMine)
+            ActivatePointer();
+        
+    }
+
+
+
+
 	void SetPointerTransform(float setLength, float setThicknes)
 	{
 		float beamPosition = setLength / (2 + 0.00001f);
@@ -31,12 +43,6 @@ public class GrabPointer : MonoBehaviour
 		pointer.transform.localPosition = new Vector3(0f, 0f, beamPosition);
 		cursor.transform.localPosition = new Vector3(0f, 0f, setLength);
 	}
-
-	void Awake()
-	{
-		ActivatePointer();
-	}
-
 	float GetBeamLength(bool bHit, RaycastHit hit)
 	{
 		float actualLength = length;
@@ -156,15 +162,18 @@ public class GrabPointer : MonoBehaviour
 		holder.SetActive(active);
 	}
 
-	public void GrabSelectedObject()
-	{
-		if (targetedObject != null)
-		{
-			grabbedObject = targetedObject;
-			grabbedObject.transform.parent = gameObject.transform;
+    public void GrabSelectedObject()
+    {
+        if (targetedObject != null)
+        {
+            PhotonView grabbedObjectView = targetedObject.GetComponent<PhotonView>();
+            if (grabbedObjectView.Owner != PhotonNetwork.LocalPlayer) grabbedObjectView.RequestOwnership();
+            
+            grabbedObject = targetedObject;
+            grabbedObject.transform.parent = gameObject.transform;
 			grabbedObject.GetComponent<Rigidbody>().isKinematic = true;
-
 			Vector3 grabbedDirection = grabbedObject.transform.forward;
+
 			if (grabbedDirection.y <= -0.99f)
 			{
 				grabbedObject.transform.forward = new Vector3(0.0f, 0.0f, 1.0f);
@@ -180,8 +189,11 @@ public class GrabPointer : MonoBehaviour
 			pitch = Mathf.Asin(grabbedDirection.y);
 			yaw1 = Mathf.Acos(grabbedDirection.x / Mathf.Cos(pitch));
 			yaw2 = Mathf.Asin(grabbedDirection.z / Mathf.Cos(pitch));
-		}
-	}
+            
+            
+            
+        }
+    }
 
 	public void UngrabSelectedObject()
 	{
