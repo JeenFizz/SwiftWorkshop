@@ -3,21 +3,17 @@ using Valve.VR;
 
 public class ControllerInput : MonoBehaviour
 {
-	public delegate void OnGrabPressed(GameObject controller);
-	public static event OnGrabPressed OnGrabPressedEvent;
-	public delegate void OnGrabReleased(GameObject controller);
-	public static event OnGrabReleased OnGrabReleasedEvent;
 	public Transform cameraRig;
 	public float rotationSpeed = 120.0f;
 
 	private SteamVR_Behaviour_Pose behaviourPose;
 	private SteamVR_Input_Sources inputSource;
+	private GrabPointer grabPointer;
 	private ControllerPointer contPointer = null;
 	private bool isTurningLeft = false;
 	private bool isTurningRight = false;
 	private bool isPulling = false;
 	private bool isPushing = false;
-	private GrabPointer grabPointer;
 
 	void Awake()
 	{
@@ -29,24 +25,16 @@ public class ControllerInput : MonoBehaviour
 	void Update()
 	{
 		if (SteamVR_Actions._default.GrabPinch.GetStateDown(inputSource))
-		{
 			if (grabPointer.targetedObject != null)
 				grabPointer.GrabSelectedObject();
-
-			OnGrabPressedEvent?.Invoke(gameObject);
-		}
 		if (SteamVR_Actions._default.GrabPinch.GetStateUp(inputSource))
-		{
 			grabPointer.UngrabSelectedObject();
-
-			OnGrabReleasedEvent?.Invoke(gameObject);
-		}
 
 		if (SteamVR_Actions._default.Teleport.GetStateDown(inputSource))
 		{
-			if(grabPointer.grabbedObject == null)
+			if (grabPointer.grabbedObject == null)
 			{
-				grabPointer.DesactivatePointer();
+				grabPointer.SetActivePointer(false);
 				TeleportPressed();
 			}
 			else
@@ -57,7 +45,7 @@ public class ControllerInput : MonoBehaviour
 			if (grabPointer.grabbedObject == null)
 			{
 				TeleportReleased();
-				grabPointer.ActivatePointer();
+				grabPointer.SetActivePointer(true);
 			}
 			isPushing = false;
 		}
@@ -68,10 +56,13 @@ public class ControllerInput : MonoBehaviour
 		if (SteamVR_Actions._default.JoystickDown.GetStateUp(inputSource))
 			isPulling = false;
 
-		if (isPulling)
-			grabPointer.Pull();
-		else if (isPushing)
-			grabPointer.Push();
+		if (grabPointer.grabbedObject != null)
+		{
+			if (isPulling)
+				grabPointer.Pull();
+			else if (isPushing)
+				grabPointer.Push();
+		}
 
 		if (SteamVR_Actions._default.SnapTurnLeft.GetStateDown(inputSource))
 			isTurningLeft = true;
@@ -87,14 +78,14 @@ public class ControllerInput : MonoBehaviour
 			if (grabPointer.grabbedObject != null)
 				grabPointer.TurnLeft();
 			else
-				TurnLeft();
+				cameraRig.Rotate(new Vector3(0, -rotationSpeed, 0) * Time.deltaTime);
 		}
 		else if (isTurningRight)
 		{
 			if (grabPointer.grabbedObject != null)
 				grabPointer.TurnRight();
 			else
-				TurnRight();
+				cameraRig.Rotate(new Vector3(0, rotationSpeed, 0) * Time.deltaTime);
 		}
 	}
 
@@ -110,21 +101,11 @@ public class ControllerInput : MonoBehaviour
 		if (contPointer != null)
 		{
 			if (contPointer.CanTeleport)
-				GameObject.Find("[CameraRig]").transform.position = contPointer.TargetPosition;
+				cameraRig.position = contPointer.TargetPosition;
 
 			contPointer.DesactivatePointer();
 			Destroy(contPointer);
 		}
-	}
-
-	void TurnRight()
-	{
-		cameraRig.transform.Rotate(new Vector3(0, rotationSpeed, 0) * Time.deltaTime);
-	}
-
-	void TurnLeft()
-	{
-		cameraRig.transform.Rotate(new Vector3(0, -rotationSpeed, 0) * Time.deltaTime);
 	}
 
 	void OnDestroy()
