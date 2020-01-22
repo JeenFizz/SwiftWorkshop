@@ -58,7 +58,11 @@ public class ProductFlowChart : MonoBehaviour
 
                 if(!ProductVisibility[pInfo.name])
                 {
-                    foreach (var p in CurrentProducts.Where(p => p.type == pInfo.name)) Destroy(p.obj);
+                    foreach (var p in CurrentProducts.Where(p => p.type == pInfo.name))
+                    {
+                        Destroy(p.obj);
+                        ProductCountChange(p.type, -1);
+                    }
                     CurrentProducts = CurrentProducts.Where(p => p.type != pInfo.name).ToList();
                 }
 
