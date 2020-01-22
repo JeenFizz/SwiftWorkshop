@@ -171,12 +171,6 @@ public class GrabPointer : MonoBehaviourPunCallbacks
             
             grabbedObject = targetedObject;
             grabbedObject.transform.parent = gameObject.transform;
-
-            Quaternion identity = Quaternion.identity;
-            Quaternion grabbedRotation = grabbedObject.transform.rotation;
-            grabbedX = identity.x;
-            grabbedY = grabbedRotation.y;
-			grabbedZ = identity.z;
 			grabbedObject.GetComponent<Rigidbody>().isKinematic = true;
 			Vector3 grabbedDirection = grabbedObject.transform.forward;
 

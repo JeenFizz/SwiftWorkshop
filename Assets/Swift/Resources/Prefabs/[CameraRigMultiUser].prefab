@@ -350,9 +350,7 @@ MonoBehaviour:
   length: 100
   targetedObject: {fileID: 0}
   grabbedObject: {fileID: 0}
-  sphere: {fileID: 934563177110170697}
-  pullSpeed: 100
-  rotationSpeed: 120
+  pullSpeed: 1
 --- !u!114 &8782175587127405846
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -744,9 +742,7 @@ MonoBehaviour:
   length: 100
   targetedObject: {fileID: 0}
   grabbedObject: {fileID: 0}
-  sphere: {fileID: 934563178262110506}
-  pullSpeed: 25
-  rotationSpeed: 120
+  pullSpeed: 1
 --- !u!114 &6436878469000592893
 MonoBehaviour:
   m_ObjectHideFlags: 0
