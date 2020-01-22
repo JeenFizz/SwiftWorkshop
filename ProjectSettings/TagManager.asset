@@ -14,10 +14,11 @@ TagManager:
   - CannotInteract
   - UI
   - DistanceUI
+  - T
   - F
   - G
   - P
-  - T
+  - ProductLabel
   layers:
   - Default
   - TransparentFX

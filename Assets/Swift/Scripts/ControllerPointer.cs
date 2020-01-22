@@ -2,134 +2,157 @@
 
 public class ControllerPointer : MonoBehaviour
 {
-    public Vector3 TargetPosition;
-    public bool CanTeleport;
-    public Color color;
-    public float thickness = 0.002f;
-    public float length = 100f;
+	public Vector3 TargetPosition;
+	public bool CanTeleport;
+	public float thickness = 0.02f;
+	public float length = 4.0f;
 
-    GameObject holder;
-    GameObject pointer;
-    GameObject cursor;
+	private GameObject holder;
+	private GameObject[] pointers;
+	private GameObject cursor;
 
-    Vector3 cursorScale = new Vector3(0.05f, 0.05f, 0.05f);
-    float contactDistance = 0f;
-    Transform contactTarget = null;
+	private Vector3 cursorScale = new Vector3(0.5f, 0.5f, 0.5f);
+	private float contactDistance = 0f;
+	private Transform contactTarget = null;
 
-    void SetPointerTransform(float setLength, float setThicknes)
-    {
-        float beamPosition = setLength / (2 + 0.00001f);
+	private Color color = Color.black;
+	private readonly int maxNbOfPointers = 12;
+	private readonly float directionChange = 0.05f;
 
-        pointer.transform.localScale = new Vector3(setThicknes, setThicknes, setLength);
-        pointer.transform.localPosition = new Vector3(0f, 0f, beamPosition);
-        cursor.transform.localPosition = new Vector3(0f, 0f, setLength);
-    }
+	void SetPointerTransform(GameObject pointer, float setLength, Vector3 position, Vector3 direction, float setThickness)
+	{
+		pointer.transform.localScale = new Vector3(setThickness, setThickness, setLength);
+		pointer.transform.position = position;
+		pointer.transform.forward = direction;
+	}
 
-    // Use this for initialization
-    void Start()
-    {
-        ActivatePointer();
-    }
+	void Awake()
+	{
+		ActivatePointer();
+	}
 
-    float GetBeamLength(bool bHit, RaycastHit hit)
-    {
-        float actualLength = length;
+	float GetBeamLength(bool bHit, RaycastHit hit)
+	{
+		float actualLength = length;
 
-        if (!bHit || (contactTarget && contactTarget != hit.transform))
-        {
-            contactDistance = 0f;
-            contactTarget = null;
-        }
-        if (bHit)
-        {
-            if (hit.distance <= 0)
-            {
+		if (!bHit || (contactTarget && contactTarget != hit.transform))
+		{
+			contactDistance = 0f;
+			contactTarget = null;
+		}
+		if (bHit)
+		{
+			if (hit.distance <= 0)
+			{
 
-            }
-            contactDistance = hit.distance;
-            contactTarget = hit.transform;
-        }
+			}
+			contactDistance = hit.distance;
+			contactTarget = hit.transform;
+		}
 
-        if (bHit && contactDistance < length)
-        {
-            actualLength = contactDistance;
-        }
+		if (bHit && contactDistance < length)
+		{
+			actualLength = contactDistance;
+		}
 
-        if (actualLength <= 0)
-        {
-            actualLength = length;
-        }
+		if (actualLength <= 0)
+		{
+			actualLength = length;
+		}
 
-        return actualLength; ;
-    }
+		return actualLength; ;
+	}
 
-    void Update()
-    {
-        Ray raycast = new Ray(transform.position, transform.forward);
+	void Update()
+	{
+		Vector3 currentPosition = transform.position;
+		Vector3 currentDirection = transform.forward;
+		CanTeleport = false;
+		cursor.SetActive(false);
+		UpdateColor(Color.red);
+		bool found = false;
+		bool firstFound = false;
+		for (int i = 0; i < maxNbOfPointers; i++)
+		{
+			Ray raycast = new Ray(currentPosition, currentDirection);
 
-        RaycastHit hitObject;
-        bool rayHit = Physics.Raycast(raycast, out hitObject);
-        if (rayHit)
-        {
-            if (hitObject.collider.gameObject.GetComponent<AllowTeleportation>())
-            {
-                CanTeleport = true;
-                TargetPosition = hitObject.point;
-                UpdateColor(Color.green);
-            } else
-            {
-                CanTeleport = false;
-                UpdateColor(Color.red);
-            }
-        }
+			RaycastHit hitObject;
+			bool rayHit = Physics.Raycast(raycast, out hitObject, length);
+			if (rayHit && !found)
+			{
+				if (hitObject.collider.gameObject.GetComponent<AllowTeleportation>())
+				{
+					CanTeleport = true;
+					TargetPosition = hitObject.point;
+					cursor.SetActive(true);
+					cursor.transform.position = TargetPosition;
+					UpdateColor(Color.green);
+				}
+				found = true;
+				firstFound = true;
+			}
+			if (!found || firstFound)
+			{
+				pointers[i].SetActive(true);
+				float beamLength = firstFound ? GetBeamLength(rayHit, hitObject) : length;
+				SetPointerTransform(pointers[i], beamLength, currentPosition + currentDirection * beamLength / 2.00001f, currentDirection, thickness);
+				currentPosition += currentDirection * beamLength;
+				currentDirection.y -= directionChange;
+				currentDirection.Normalize();
+				firstFound = false;
+			}
+			else
+				pointers[i].SetActive(false);
+		}
+	}
 
-        float beamLength = GetBeamLength(rayHit, hitObject);
-        SetPointerTransform(beamLength, thickness);
-    }
+	void UpdateColor(Color color)
+	{
+		for (int i = 0; i < maxNbOfPointers; i++)
+			pointers[i].GetComponent<MeshRenderer>().material.SetColor("_Color", color);
+		cursor.GetComponent<MeshRenderer>().material.SetColor("_Color", color);
+	}
 
-    public void UpdateColor(Color color)
-    {
-        pointer.GetComponent<MeshRenderer>().material.SetColor("_Color", color);
-        cursor.GetComponent<MeshRenderer>().material.SetColor("_Color", color);
-    }
+	void ActivatePointer()
+	{
+		Material newMaterial = new Material(Shader.Find("Unlit/Color"));
+		newMaterial.SetColor("_Color", color);
 
-    public void ActivatePointer()
-    {
-        Material newMaterial = new Material(Shader.Find("Unlit/Color"));
-        newMaterial.SetColor("_Color", color);
+		holder = new GameObject();
+		holder.name = "Pointer";
+		holder.transform.parent = this.transform;
+		holder.transform.localPosition = Vector3.zero;
+		holder.transform.localRotation = Quaternion.identity;
 
-        holder = new GameObject();
-        holder.name = "Pointer";
-        holder.transform.parent = this.transform;
-        holder.transform.localPosition = Vector3.zero;
-        
+		cursor = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+		cursor.name = "Cursor";
+		cursor.transform.parent = holder.transform;
+		cursor.GetComponent<MeshRenderer>().material = newMaterial;
+		cursor.transform.localScale = cursorScale;
 
-        pointer = GameObject.CreatePrimitive(PrimitiveType.Cube);
-        pointer.name = "Laser";
-        pointer.transform.parent = holder.transform;
-        pointer.GetComponent<MeshRenderer>().material = newMaterial;
+		cursor.GetComponent<SphereCollider>().isTrigger = true;
+		cursor.AddComponent<Rigidbody>().isKinematic = true;
+		cursor.layer = 2;
 
-        pointer.GetComponent<BoxCollider>().isTrigger = true;
-        pointer.AddComponent<Rigidbody>().isKinematic = true;
-        pointer.layer = 2;
+		pointers = new GameObject[maxNbOfPointers];
+		for (int i = 0; i < maxNbOfPointers; i++)
+		{
+			pointers[i] = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			pointers[i].name = "Laser";
+			pointers[i].transform.parent = holder.transform;
+			pointers[i].GetComponent<MeshRenderer>().material = newMaterial;
 
-        cursor = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-        cursor.name = "Cursor";
-        cursor.transform.parent = holder.transform;
-        cursor.GetComponent<MeshRenderer>().material = newMaterial;
-        cursor.transform.localScale = cursorScale;
+			pointers[i].GetComponent<BoxCollider>().isTrigger = true;
+			pointers[i].AddComponent<Rigidbody>().isKinematic = true;
+			pointers[i].layer = 2;
+		}
+	}
 
-        cursor.GetComponent<SphereCollider>().isTrigger = true;
-        cursor.AddComponent<Rigidbody>().isKinematic = true;
-        cursor.layer = 2;
-        holder.transform.localRotation = new Quaternion(0, 0, 0, 0);
-        SetPointerTransform(length, thickness);
-    }
-
-    public void DesactivatePointer()
-    {
-        Destroy(holder);
-        Destroy(pointer);
-        Destroy(cursor);
-    }
+	public void DesactivatePointer()
+	{
+		for (int i = 0; i < maxNbOfPointers; i++)
+			Destroy(pointers[i]);
+		Destroy(cursor);
+		Destroy(holder);
+	}
 }

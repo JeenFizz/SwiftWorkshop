@@ -3,97 +3,112 @@ using Valve.VR;
 
 public class ControllerInput : MonoBehaviour
 {
-	public delegate void OnGrabPressed(GameObject controller);
-	public static event OnGrabPressed OnGrabPressedEvent;
-	public delegate void OnGrabReleased(GameObject controller);
-	public static event OnGrabReleased OnGrabReleasedEvent;
+	public Transform cameraRig;
+	public float rotationSpeed = 120.0f;
 
 	private SteamVR_Behaviour_Pose behaviourPose;
 	private SteamVR_Input_Sources inputSource;
-	private GameObject selectedObject;
-	private FixedJoint joint;
-	private ControllerPointer contPointer;
+	private GrabPointer grabPointer;
+	private ControllerPointer contPointer = null;
+	private bool isTurningLeft = false;
+	private bool isTurningRight = false;
+	private bool isPulling = false;
+	private bool isPushing = false;
 
 	void Awake()
 	{
 		behaviourPose = GetComponent<SteamVR_Behaviour_Pose>();
 		inputSource = behaviourPose.inputSource;
+		grabPointer = GetComponent<GrabPointer>();
 	}
 
 	void Update()
 	{
 		if (SteamVR_Actions._default.GrabPinch.GetStateDown(inputSource))
-		{
-			if (selectedObject != null)
-				GrabSelectedObject();
-
-			OnGrabPressedEvent?.Invoke(gameObject);
-		}
+			if (grabPointer.targetedObject != null)
+				grabPointer.GrabSelectedObject();
 		if (SteamVR_Actions._default.GrabPinch.GetStateUp(inputSource))
-		{
-			if (selectedObject != null)
-				UngrabSelectedObject();
-
-			OnGrabReleasedEvent?.Invoke(gameObject);
-		}
+			grabPointer.UngrabSelectedObject();
 
 		if (SteamVR_Actions._default.Teleport.GetStateDown(inputSource))
-			TeleportPressed();
+		{
+			if (grabPointer.grabbedObject == null)
+			{
+				grabPointer.SetActivePointer(false);
+				TeleportPressed();
+			}
+			else
+				isPushing = true;
+		}
 		if (SteamVR_Actions._default.Teleport.GetStateUp(inputSource))
-			TeleportReleased();
-	}
-
-	void OnTriggerEnter(Collider other)
-	{
-		if (other.GetComponent<GrabbableObject>())
-			selectedObject = other.gameObject;
-	}
-
-	void OnTriggerExit(Collider other)
-	{
-		if (other.gameObject == selectedObject)
-			selectedObject = null;
-	}
-
-	void GrabSelectedObject()
-	{
-		if (joint == null)
 		{
-			joint = gameObject.AddComponent<FixedJoint>();
-			joint.connectedBody = selectedObject.GetComponent<Rigidbody>();
-			joint.breakForce = 20000;
-			joint.breakTorque = 20000;
+			if (grabPointer.grabbedObject == null)
+			{
+				TeleportReleased();
+				grabPointer.SetActivePointer(true);
+			}
+			isPushing = false;
+		}
+
+		if (SteamVR_Actions._default.JoystickDown.GetStateDown(inputSource))
+			if (grabPointer.grabbedObject != null)
+				isPulling = true;
+		if (SteamVR_Actions._default.JoystickDown.GetStateUp(inputSource))
+			isPulling = false;
+
+		if (grabPointer.grabbedObject != null)
+		{
+			if (isPulling)
+				grabPointer.Pull();
+			else if (isPushing)
+				grabPointer.Push();
+		}
+
+		if (SteamVR_Actions._default.SnapTurnLeft.GetStateDown(inputSource))
+			isTurningLeft = true;
+		if (SteamVR_Actions._default.SnapTurnLeft.GetStateUp(inputSource))
+			isTurningLeft = false;
+		if (SteamVR_Actions._default.SnapTurnRight.GetStateDown(inputSource))
+			isTurningRight = true;
+		if (SteamVR_Actions._default.SnapTurnRight.GetStateUp(inputSource))
+			isTurningRight = false;
+
+		if (isTurningLeft)
+		{
+			if (grabPointer.grabbedObject != null)
+				grabPointer.TurnLeft();
+			else
+				cameraRig.Rotate(new Vector3(0, -rotationSpeed, 0) * Time.deltaTime);
+		}
+		else if (isTurningRight)
+		{
+			if (grabPointer.grabbedObject != null)
+				grabPointer.TurnRight();
+			else
+				cameraRig.Rotate(new Vector3(0, rotationSpeed, 0) * Time.deltaTime);
 		}
 	}
 
-	void UngrabSelectedObject()
-	{
-		if (joint != null)
-		{
-			joint.connectedBody = null;
-			Destroy(joint);
-			selectedObject.GetComponent<Rigidbody>().velocity = behaviourPose.GetVelocity();
-			selectedObject.GetComponent<Rigidbody>().angularVelocity = behaviourPose.GetAngularVelocity();
-		}
-	}
 
 	void TeleportPressed()
 	{
 		if (contPointer == null)
-		{
 			contPointer = gameObject.AddComponent<ControllerPointer>();
-			contPointer.UpdateColor(Color.green);
-		}
 	}
 
 	void TeleportReleased()
 	{
-		if (contPointer.CanTeleport)
+		if (contPointer != null)
 		{
-			GameObject cameraRig = GameObject.Find("[CameraRig]");
-			cameraRig.transform.position = contPointer.TargetPosition;
+			if (contPointer.CanTeleport)
+				transform.parent.position = contPointer.TargetPosition;
 			contPointer.DesactivatePointer();
 			Destroy(contPointer);
 		}
+	}
+
+	void OnDestroy()
+	{
+		grabPointer.DesactivatePointer();
 	}
 }
