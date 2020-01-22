@@ -74,10 +74,15 @@ public class MachineLayoutSaver : MonoBehaviour
         string lastSave = Directory.GetFiles(saveDir, "*.json").Last();
         Debug.Log($"Loading {lastSave}");
 
-        FactorySave save = JsonUtility.FromJson<FactorySave>(File.ReadAllText(lastSave));
+        LoadFile(lastSave);
+    }
 
-        foreach (string tag in machines.Select(m => m.tag)) 
-            foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag)) 
+    public void LoadFile(string file)
+    {
+        FactorySave save = JsonUtility.FromJson<FactorySave>(File.ReadAllText(file));
+
+        foreach (string tag in machines.Select(m => m.tag))
+            foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag))
                 Destroy(obj);
 
         foreach (MachineData mData in save.machines)
