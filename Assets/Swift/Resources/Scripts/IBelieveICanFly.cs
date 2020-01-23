@@ -7,6 +7,8 @@ public class IBelieveICanFly : MonoBehaviour
 {
     private bool meIsFly = false;
 
+    public int height = 100;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -19,6 +21,6 @@ public class IBelieveICanFly : MonoBehaviour
         if (!Input.GetKeyDown(KeyCode.F)) return;
 
         meIsFly = !meIsFly;
-        GetComponent<UserManager>().goFreeLookCameraRig.transform.Find("Pivot").transform.position += (meIsFly ? Vector3.up : Vector3.down) * 20;
+        GetComponent<UserManager>().goFreeLookCameraRig.transform.Find("Pivot").transform.position += (meIsFly ? Vector3.up : Vector3.down) * height;
     }
 }
