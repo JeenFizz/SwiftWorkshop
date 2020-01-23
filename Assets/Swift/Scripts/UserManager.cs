@@ -20,7 +20,7 @@ namespace WS3
         /// <summary>
         /// The FreeLookCameraRig GameObject to configure for the UserMe
         /// </summary>
-        GameObject goFreeLookCameraRig = null;
+        public GameObject goFreeLookCameraRig = null;
 
 
         void Awake()
@@ -40,14 +40,15 @@ namespace WS3
             updateGoFreeLookCameraRig();
             followLocalPlayer();
             activateLocalPlayer();
+
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
         }
 
         // Update is called once per frame
         void Update()
         {
             //Screen.lockCursor = true;
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
         }
 
         /// <summary>
