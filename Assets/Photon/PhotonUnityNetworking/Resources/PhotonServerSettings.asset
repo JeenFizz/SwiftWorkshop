@@ -35,5 +35,8 @@ MonoBehaviour:
   - Fire
   - RespawnSpaceship
   - PlaceMachines
+  - SpawnProduct
+  - DeleteMachines
+  - PlaceMachine
   DisableAutoOpenWizard: 1
   ShowSettings: 0
