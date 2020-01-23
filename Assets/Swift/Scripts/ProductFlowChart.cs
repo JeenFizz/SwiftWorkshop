@@ -84,7 +84,7 @@ public class ProductFlowChart : MonoBehaviour
         foreach (var product in CurrentProducts)
         {
             GameObject target = GameObject.Find(product.path.First());
-            if (target == null) continue;
+            if (target == null || product.obj == null) continue;
             float step = speed * Time.deltaTime;
             Vector3 targetPos = target.transform.position;
             Vector3 currentPos = product.obj.transform.position;
@@ -97,7 +97,8 @@ public class ProductFlowChart : MonoBehaviour
                 if(product.path.Count == 0)
                 {
                     newList.Remove(product);
-                    product.obj.GetComponent<PhotonView>().RequestOwnership();
+                    var photonView = product.obj.GetComponent<PhotonView>();
+                    photonView.RequestOwnership();
                     PhotonNetwork.Destroy(product.obj);
                     ProductCountChange(product.type, -1);
                 }
@@ -117,15 +118,21 @@ public class ProductFlowChart : MonoBehaviour
 
             if (ProductVisibility[productInfo.name] && machine != null)
             {
-                GameObject productObject = PhotonNetwork.Instantiate("Product", machine.transform.position, new Quaternion());
-                productObject.GetComponent<MeshRenderer>().material.color = productInfo.color;
-
-                foreach (TextMesh tmesh in productObject.transform.GetComponentsInChildren<TextMesh>()) tmesh.text = productInfo.name;
-
-                ProductCountChange(productInfo.name, 1);
-                CurrentProducts.Add((productInfo.machines.ToList(), productObject, productInfo.name));
+                GetComponent<PhotonView>().RPC("SpawnProduct", RpcTarget.MasterClient, productInfo, machine.transform.position);
             }
         }
+    }
+
+    [PunRPC]
+    public void SpawnProduct(ProductInfo productInfo, Vector3 pos)
+    {
+        GameObject productObject = PhotonNetwork.InstantiateSceneObject("Product", pos, new Quaternion());
+        productObject.GetComponent<MeshRenderer>().material.color = productInfo.color;
+
+        foreach (TextMesh tmesh in productObject.transform.GetComponentsInChildren<TextMesh>()) tmesh.text = productInfo.name;
+
+        ProductCountChange(productInfo.name, 1);
+        CurrentProducts.Add((productInfo.machines.ToList(), productObject, productInfo.name));
     }
 
     private void ProductCountChange(string name, int offset)
@@ -135,10 +142,5 @@ public class ProductFlowChart : MonoBehaviour
         var countLabel = ProductInfos.First(p => p.name == name).ui.transform.Find("AmountLabel").GetComponent<Text>();
 
         countLabel.text = (int.Parse(countLabel.text) + offset).ToString();
-    }
-
-    public void SetProductVisibility(string product, bool v)
-    {
-
     }
 }

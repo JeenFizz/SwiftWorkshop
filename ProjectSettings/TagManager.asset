@@ -19,6 +19,8 @@ TagManager:
   - G
   - P
   - ProductLabel
+  - FactoryMap
+  - InteractionTool
   layers:
   - Default
   - TransparentFX

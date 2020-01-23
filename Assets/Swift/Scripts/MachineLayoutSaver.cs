@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using Photon.Realtime;
+using System.Threading;
 
 public class MachineLayoutSaver : MonoBehaviour
 {
@@ -20,8 +22,8 @@ public class MachineLayoutSaver : MonoBehaviour
     public struct MachineData
     {
         public string machineType;
-        public Vector3 position;
-        public Quaternion rot;
+        public float[] position;
+        public float[] rot;
         public string name;
     }
 
@@ -32,7 +34,7 @@ public class MachineLayoutSaver : MonoBehaviour
     }
 
     private string saveDir;
-
+    private FactorySave save;
     // Start is called before the first frame update
     void Start()
     {
@@ -50,11 +52,27 @@ public class MachineLayoutSaver : MonoBehaviour
     {
         if (!Input.GetKeyDown("m")) return;
 
+        SaveConfig();
+    }
+
+    public void SaveConfig()
+    {
         IEnumerable<MachineData> machineInfos = machines
             .Aggregate(new List<MachineData>() as IEnumerable<MachineData>, (prev, next) =>
                 prev.Concat(
                     GameObject.FindGameObjectsWithTag(next.tag)
-                        .Select(machine => new MachineData() { machineType = next.tag, position = machine.transform.position, rot = machine.transform.rotation, name = machine.name })
+                        .Select(machine => new MachineData() { 
+                            machineType = next.tag, position = new float[] {
+                                machine.transform.position.x,
+                                machine.transform.position.y,
+                                machine.transform.position.z
+                            }, rot = new float[] {
+                                machine.transform.rotation.x,
+                                machine.transform.rotation.y,
+                                machine.transform.rotation.z,
+                                machine.transform.rotation.w
+                            }, name = machine.name 
+                        })
                 )
             );
 
@@ -67,6 +85,9 @@ public class MachineLayoutSaver : MonoBehaviour
         Debug.Log(saveContent);
 
         File.WriteAllText(path, saveContent);
+
+        path = saveDir + $"/Swift {now.Year}-{now.Month}-{now.Day} {now.Hour}-{now.Minute}-{now.Second}.jpg";
+        ScreenCapture.CaptureScreenshot(path);
     }
 
     void CheckLoad()
@@ -81,28 +102,43 @@ public class MachineLayoutSaver : MonoBehaviour
 
     public void LoadFile(string file)
     {
-        FactorySave save = JsonUtility.FromJson<FactorySave>(File.ReadAllText(file));
+        save = JsonUtility.FromJson<FactorySave>(File.ReadAllText(file));
 
+        GetComponent<PhotonView>().RPC("DeleteMachines", RpcTarget.MasterClient);
+        
+    }
+
+    
+    [PunRPC]
+    public void PlaceMachine(string machineType, float[] position, float[] rot, string name)
+    {
+        string machineName = machines.First(m => m.tag == machineType).prefab.name;
+        GameObject machine = PhotonNetwork.InstantiateSceneObject(
+            machineName, 
+            new Vector3(position[0], position[1], position[2]), 
+            new Quaternion(rot[0], rot[1], rot[2], rot[3])
+        );
+        machine.tag = machineType;
+        machine.name = name.Substring(0, 2);
+    }
+
+    [PunRPC]
+    public void DeleteMachines()
+    {
         foreach (string tag in machines.Select(m => m.tag))
             foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag))
             {
                 obj.GetComponent<PhotonView>().RequestOwnership();
-                try
-                {
-                    PhotonNetwork.Destroy(obj);
-                }
-                catch (Exception e)
-                {
-                    Debug.Log("sheesh");
-                }
+                Thread.Sleep(200);
+                PhotonNetwork.Destroy(obj);
+                
             }
-
         foreach (MachineData mData in save.machines)
-        {
-            string machineName = machines.First(m => m.tag == mData.machineType).prefab.name;
-            GameObject machine = PhotonNetwork.Instantiate(machineName, mData.position, mData.rot);
-            machine.tag = mData.machineType;
-            machine.name = mData.name.Substring(0, 2);
-        }
+            GetComponent<PhotonView>().RPC("PlaceMachine", RpcTarget.MasterClient, mData.machineType, mData.position, mData.rot, mData.name);
+    }
+
+    private IEnumerator wait(GameObject obj)
+    {
+        yield return new WaitForSeconds(0.2f);
     }
 }

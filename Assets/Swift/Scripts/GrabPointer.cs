@@ -3,7 +3,6 @@ using Photon.Pun;
 
 public class GrabPointer : MonoBehaviourPunCallbacks
 {
-
 	public float thickness = 0.002f;
 	public float length = 100f;
 	public GameObject targetedObject;
@@ -25,15 +24,11 @@ public class GrabPointer : MonoBehaviourPunCallbacks
 	private float yaw2 = 0.0f;
 	private float mult = 0.0f;
 
-    void Awake()
-    {
-        if(photonView.IsMine)
-            ActivatePointer();
-        
-    }
-
-
-
+	void Awake()
+	{
+		if (photonView.IsMine)
+			ActivatePointer();
+	}
 
 	void SetPointerTransform(float setLength, float setThicknes)
 	{
@@ -43,6 +38,7 @@ public class GrabPointer : MonoBehaviourPunCallbacks
 		pointer.transform.localPosition = new Vector3(0f, 0f, beamPosition);
 		cursor.transform.localPosition = new Vector3(0f, 0f, setLength);
 	}
+
 	float GetBeamLength(bool bHit, RaycastHit hit)
 	{
 		float actualLength = length;
@@ -159,18 +155,22 @@ public class GrabPointer : MonoBehaviourPunCallbacks
 
 	public void SetActivePointer(bool active)
 	{
-		holder.SetActive(active);
+		if (holder != null)
+			holder.SetActive(active);
 	}
 
-    public void GrabSelectedObject()
-    {
-        if (targetedObject != null)
-        {
-            PhotonView grabbedObjectView = targetedObject.GetComponent<PhotonView>();
-            if (grabbedObjectView.Owner != PhotonNetwork.LocalPlayer) grabbedObjectView.RequestOwnership();
-            
-            grabbedObject = targetedObject;
-            grabbedObject.transform.parent = gameObject.transform;
+	public void GrabSelectedObject()
+	{
+		if (targetedObject != null)
+		{
+			PhotonView grabbedObjectView = targetedObject.GetComponent<PhotonView>();
+			if (grabbedObjectView.Owner != PhotonNetwork.LocalPlayer)
+			{
+				grabbedObjectView.RequestOwnership();
+			}
+
+			grabbedObject = targetedObject;
+			grabbedObject.transform.parent = gameObject.transform;
 			grabbedObject.GetComponent<Rigidbody>().isKinematic = true;
 			Vector3 grabbedDirection = grabbedObject.transform.forward;
 
@@ -189,11 +189,8 @@ public class GrabPointer : MonoBehaviourPunCallbacks
 			pitch = Mathf.Asin(grabbedDirection.y);
 			yaw1 = Mathf.Acos(grabbedDirection.x / Mathf.Cos(pitch));
 			yaw2 = Mathf.Asin(grabbedDirection.z / Mathf.Cos(pitch));
-            
-            
-            
-        }
-    }
+		}
+	}
 
 	public void UngrabSelectedObject()
 	{
@@ -213,6 +210,8 @@ public class GrabPointer : MonoBehaviourPunCallbacks
 
 			grabbedObject.GetComponent<Rigidbody>().isKinematic = false;
 			grabbedObject.transform.parent = null;
+			PhotonView grabbedObjectView = targetedObject.GetComponent<PhotonView>();
+			grabbedObjectView.TransferOwnership(0);
 			grabbedObject = null;
 		}
 	}
