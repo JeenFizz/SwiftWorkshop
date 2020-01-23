@@ -17,7 +17,7 @@ public class ControllerPointer : MonoBehaviour
 
 	private Color color = Color.black;
 	private readonly int maxNbOfPointers = 12;
-	private readonly float directionChange = 0.05f;
+	private readonly float directionChange = 0.1f;
 
 	void SetPointerTransform(GameObject pointer, float setLength, Vector3 position, Vector3 direction, float setThickness)
 	{
@@ -65,8 +65,10 @@ public class ControllerPointer : MonoBehaviour
 
 	void Update()
 	{
-		Vector3 currentPosition = transform.position;
+		Vector3 currentPosition = transform.position + transform.forward * 0.05f;
 		Vector3 currentDirection = transform.forward;
+		currentDirection.y -= 0.3f;
+		currentDirection.Normalize();
 		CanTeleport = false;
 		cursor.SetActive(false);
 		UpdateColor(Color.red);

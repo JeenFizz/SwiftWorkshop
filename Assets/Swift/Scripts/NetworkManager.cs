@@ -107,10 +107,10 @@ namespace WS3
         private void Update()
         {
             // Code to leave the room by pressing CTRL + the Leave button
-            if (Input.GetButtonUp("Leave") && Input.GetKeyDown(KeyCode.LeftControl | KeyCode.RightControl))
+            if (Input.GetButtonUp("Leave"))
             {
                 Debug.Log("Leave event");
-                LeaveRoom();
+                Application.Quit();
             }
         }
         #endregion

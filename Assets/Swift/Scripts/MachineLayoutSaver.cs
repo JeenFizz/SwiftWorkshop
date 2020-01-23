@@ -48,6 +48,11 @@ public class MachineLayoutSaver : MonoBehaviour
     {
         if (!Input.GetKeyDown("m")) return;
 
+        SaveConfig();
+    }
+
+    public string SaveConfig()
+    {
         IEnumerable<MachineData> machineInfos = machines
             .Aggregate(new List<MachineData>() as IEnumerable<MachineData>, (prev, next) =>
                 prev.Concat(
@@ -65,6 +70,7 @@ public class MachineLayoutSaver : MonoBehaviour
         Debug.Log(saveContent);
 
         File.WriteAllText(path, saveContent);
+        return path;
     }
 
     void CheckLoad()
