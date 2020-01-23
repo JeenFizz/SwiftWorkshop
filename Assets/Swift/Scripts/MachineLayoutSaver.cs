@@ -35,10 +35,12 @@ public class MachineLayoutSaver : MonoBehaviour
 
     private string saveDir;
     private FactorySave save;
+    private string file;
     // Start is called before the first frame update
     void Start()
     {
         saveDir = Application.dataPath + "/StreamingAssets/MachineSaves";
+        BetterStreamingAssets.Initialize();
     }
 
     // Update is called once per frame
@@ -140,5 +142,16 @@ public class MachineLayoutSaver : MonoBehaviour
     private IEnumerator wait(GameObject obj)
     {
         yield return new WaitForSeconds(0.2f);
+    }
+
+    public void LoadFileAR()
+    {
+        foreach (string file in BetterStreamingAssets.GetFiles("MachineSaves", "*.json"))
+        {
+            this.file = file;
+        }
+        save = JsonUtility.FromJson<FactorySave>(BetterStreamingAssets.ReadAllText(this.file));
+
+        GetComponent<PhotonView>().RPC("DeleteMachines", RpcTarget.MasterClient);
     }
 }

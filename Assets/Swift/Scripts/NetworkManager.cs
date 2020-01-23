@@ -92,7 +92,7 @@ namespace WS3
                 {
                     Debug.LogFormat("We are Instantiating LocalPlayer from {0}", SceneManagerHelper.ActiveSceneName);
                     // we're in a room. spawn a character for the local player. it gets synced by using PhotonNetwork.Instantiate
-                    PhotonNetwork.Instantiate("Prefabs/" + UserDeviceManager.GetPrefabToSpawnWithDeviceUsed(playerPrefabPC, playerPrefabVR).name, new Vector3(-48.7f, 0.1f, 28.7f), Quaternion.identity);
+                    //PhotonNetwork.Instantiate("Prefabs/" + UserDeviceManager.GetPrefabToSpawnWithDeviceUsed(playerPrefabPC, playerPrefabVR).name, new Vector3(-48.7f, 0.1f, 28.7f), Quaternion.identity);
                 }
                 else
                 {
