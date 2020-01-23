@@ -11,7 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Swift/Scenes/LobbyScene.unity
     guid: 19c5d75aad5d70743b959478275b5b72
-  - enabled: 1
+  - enabled: 0
     path: Assets/Swift/Scenes/SwiftShopLayout.unity
     guid: 5ffe2dd1ab31f344fbefd42b263d33e7
   - enabled: 0
