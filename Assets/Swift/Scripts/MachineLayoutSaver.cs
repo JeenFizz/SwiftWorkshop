@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 using Photon.Realtime;
+using System.Threading;
 
 public class MachineLayoutSaver : MonoBehaviour
 {
@@ -33,7 +34,7 @@ public class MachineLayoutSaver : MonoBehaviour
     }
 
     private string saveDir;
-
+    private FactorySave save;
     // Start is called before the first frame update
     void Start()
     {
@@ -51,6 +52,11 @@ public class MachineLayoutSaver : MonoBehaviour
     {
         if (!Input.GetKeyDown("m")) return;
 
+        SaveConfig();
+    }
+
+    public void SaveConfig()
+    {
         IEnumerable<MachineData> machineInfos = machines
             .Aggregate(new List<MachineData>() as IEnumerable<MachineData>, (prev, next) =>
                 prev.Concat(
@@ -79,6 +85,9 @@ public class MachineLayoutSaver : MonoBehaviour
         Debug.Log(saveContent);
 
         File.WriteAllText(path, saveContent);
+
+        path = saveDir + $"/Swift {now.Year}-{now.Month}-{now.Day} {now.Hour}-{now.Minute}-{now.Second}.jpg";
+        ScreenCapture.CaptureScreenshot(path);
     }
 
     void CheckLoad()
@@ -93,12 +102,9 @@ public class MachineLayoutSaver : MonoBehaviour
 
     public void LoadFile(string file)
     {
-        var save = JsonUtility.FromJson<FactorySave>(File.ReadAllText(file));
+        save = JsonUtility.FromJson<FactorySave>(File.ReadAllText(file));
 
         GetComponent<PhotonView>().RPC("DeleteMachines", RpcTarget.MasterClient);
-
-        foreach (MachineData mData in save.machines)
-            GetComponent<PhotonView>().RPC("PlaceMachine", RpcTarget.MasterClient, mData.machineType, mData.position, mData.rot, mData.name);
     }
 
     [PunRPC]
@@ -121,7 +127,11 @@ public class MachineLayoutSaver : MonoBehaviour
             foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag))
             {
                 obj.GetComponent<PhotonView>().RequestOwnership();
+                Thread.Sleep(200);
                 PhotonNetwork.Destroy(obj);
             }
+
+        foreach (MachineData mData in save.machines)
+            GetComponent<PhotonView>().RPC("PlaceMachine", RpcTarget.MasterClient, mData.machineType, mData.position, mData.rot, mData.name);
     }
 }

@@ -4,12 +4,13 @@ using UnityEngine;
 
 public class ThirdPersonMenuHandler : MonoBehaviour
 {
-    private bool showUI = true;
+    private bool showUI = false;
     public GameObject UI;
     // Start is called before the first frame update
     void Start()
     {
         UI = GameObject.Find("Interface");
+        UI.SetActive(false);
     }
 
     // Update is called once per frame
