@@ -84,9 +84,7 @@ public class MachineLayoutSaver : MonoBehaviour
     {
         var save = JsonUtility.FromJson<FactorySave>(File.ReadAllText(file));
 
-        foreach (string tag in machines.Select(m => m.tag))
-            foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag))
-                obj.GetComponent<PhotonView>().RPC("PlaceMachines", RpcTarget.MasterClient, save);
+        GetComponent<PhotonView>().RPC("PlaceMachines", RpcTarget.MasterClient, save);
     }
 
     [PunRPC]

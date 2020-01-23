@@ -19,7 +19,7 @@ MonoBehaviour:
     AppVersion: 
     UseNameServer: 0
     FixedRegion: 
-    Server: 10.144.50.4
+    Server: 192.168.43.72
     Port: 5055
     Protocol: 0
     EnableLobbyStatistics: 0
@@ -34,5 +34,6 @@ MonoBehaviour:
   - DestroySpaceship
   - Fire
   - RespawnSpaceship
+  - PlaceMachines
   DisableAutoOpenWizard: 1
   ShowSettings: 0
