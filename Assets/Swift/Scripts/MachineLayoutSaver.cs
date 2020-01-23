@@ -21,8 +21,8 @@ public class MachineLayoutSaver : MonoBehaviour
     public struct MachineData
     {
         public string machineType;
-        public Vector3 position;
-        public Quaternion rot;
+        public float[] position;
+        public float[] rot;
         public string name;
     }
 
@@ -55,7 +55,18 @@ public class MachineLayoutSaver : MonoBehaviour
             .Aggregate(new List<MachineData>() as IEnumerable<MachineData>, (prev, next) =>
                 prev.Concat(
                     GameObject.FindGameObjectsWithTag(next.tag)
-                        .Select(machine => new MachineData() { machineType = next.tag, position = machine.transform.position, rot = machine.transform.rotation, name = machine.name })
+                        .Select(machine => new MachineData() { 
+                            machineType = next.tag, position = new float[] {
+                                machine.transform.position.x,
+                                machine.transform.position.y,
+                                machine.transform.position.z
+                            }, rot = new float[] {
+                                machine.transform.rotation.x,
+                                machine.transform.rotation.y,
+                                machine.transform.rotation.z,
+                                machine.transform.rotation.w
+                            }, name = machine.name 
+                        })
                 )
             );
 
@@ -100,7 +111,11 @@ public class MachineLayoutSaver : MonoBehaviour
         foreach (MachineData mData in save.machines)
         {
             string machineName = machines.First(m => m.tag == mData.machineType).prefab.name;
-            GameObject machine = PhotonNetwork.InstantiateSceneObject(machineName, mData.position, mData.rot);
+            GameObject machine = PhotonNetwork.InstantiateSceneObject(
+                machineName, 
+                new Vector3(mData.position[0], mData.position[1], mData.position[2]), 
+                new Quaternion(mData.rot[0], mData.rot[1], mData.rot[2], mData.rot[3])
+           );
             machine.tag = mData.machineType;
             machine.name = mData.name.Substring(0, 2);
         }
