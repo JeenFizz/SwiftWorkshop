@@ -95,11 +95,11 @@ public class MachineLayoutSaver : MonoBehaviour
     {
         var save = JsonUtility.FromJson<FactorySave>(File.ReadAllText(file));
 
-        GetComponent<PhotonView>().RPC("PlaceMachines", RpcTarget.MasterClient, save);
+        GetComponent<PhotonView>().RPC("PlaceMachines", RpcTarget.MasterClient, save.machines);
     }
 
     [PunRPC]
-    public void PlaceMachines(FactorySave save)
+    public void PlaceMachines(MachineData[] save)
     {
         foreach (string tag in machines.Select(m => m.tag))
             foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag))
@@ -108,7 +108,7 @@ public class MachineLayoutSaver : MonoBehaviour
                 PhotonNetwork.Destroy(obj);
             }
 
-        foreach (MachineData mData in save.machines)
+        foreach (MachineData mData in save)
         {
             string machineName = machines.First(m => m.tag == mData.machineType).prefab.name;
             GameObject machine = PhotonNetwork.InstantiateSceneObject(
