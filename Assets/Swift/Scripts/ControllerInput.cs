@@ -57,6 +57,7 @@ public class ControllerInput : MonoBehaviour
 	private bool isPulling = false;
 	private bool isPushing = false;
 
+	private MachineLayoutSaver machineLayoutSaver;
 	private float timeBeforeToolNameTextDisabling = 0.0f;
 	private readonly List<JsonConfig> jsonConfigs = new List<JsonConfig>();
 	private string path;
@@ -68,6 +69,7 @@ public class ControllerInput : MonoBehaviour
 		behaviourPose = GetComponent<SteamVR_Behaviour_Pose>();
 		inputSource = behaviourPose.inputSource;
 		grabPointer = GetComponent<GrabPointer>();
+		machineLayoutSaver = GameObject.FindWithTag("FactoryMap").GetComponent<MachineLayoutSaver>();
 	}
 
 	void Start()
@@ -283,7 +285,8 @@ public class ControllerInput : MonoBehaviour
 
 	void OnSaveUpdate()
 	{
-
+		if (SteamVR_Actions._default.GrabPinch.GetStateDown(inputSource))
+			machineLayoutSaver.SaveConfig();
 	}
 
 	void OnLoadOpening()
