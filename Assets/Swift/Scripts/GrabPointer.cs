@@ -155,7 +155,8 @@ public class GrabPointer : MonoBehaviourPunCallbacks
 
 	public void SetActivePointer(bool active)
 	{
-		holder.SetActive(active);
+		if (holder != null)
+			holder.SetActive(active);
 	}
 
 	public void GrabSelectedObject()

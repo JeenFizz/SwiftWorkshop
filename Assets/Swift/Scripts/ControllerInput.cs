@@ -15,6 +15,13 @@ public class ControllerInput : MonoBehaviour
 		Load
 	}
 
+	public struct JsonConfig
+	{
+		public string fileName;
+		public string name;
+		public string screenshotName;
+	}
+
 	private readonly List<string> toolNames = new List<string>
 	{
 		"Screenshot",
@@ -34,6 +41,7 @@ public class ControllerInput : MonoBehaviour
 	public float rotationSpeed = 120.0f;
 	public Text toolNameText;
 	public List<ToolObject> toolObjects;
+	public List<GameObject> loadPanels;
 
 	private SteamVR_Behaviour_Pose behaviourPose;
 	private SteamVR_Input_Sources inputSource;
@@ -47,11 +55,12 @@ public class ControllerInput : MonoBehaviour
 	private bool isTurningRight = false;
 	private bool isPulling = false;
 	private bool isPushing = false;
-	private float timeBeforeToolNameTextDisabling = 0.0f;
 
-	private readonly List<string> jsonConfigFileNames;
-	private readonly List<string> jsonConfigNames;
-	private readonly List<string> jsonScreenshotFileNames;
+	private float timeBeforeToolNameTextDisabling = 0.0f;
+	private readonly List<JsonConfig> jsonConfigs = new List<JsonConfig>();
+	private string path;
+	private string configPath;
+	private string screenshotPath;
 
 	void Awake()
 	{
@@ -63,6 +72,10 @@ public class ControllerInput : MonoBehaviour
 
 	void Start()
 	{
+		path = Application.dataPath + "/StreamingAssets/";
+		configPath = path + "MachineSaves/";
+		screenshotPath = path + "Screenshots/";
+
 		toolUpdateCallbacks.Add(ToolState.Screenshot, OnScreenshotUpdate);
 		toolUpdateCallbacks.Add(ToolState.Save, OnSaveUpdate);
 		toolUpdateCallbacks.Add(ToolState.Load, OnLoadUpdate);
@@ -190,7 +203,8 @@ public class ControllerInput : MonoBehaviour
 					{
 						toolObject.gameObject.SetActive(true);
 						toolNameText.gameObject.SetActive(false);
-						toolOpeningCallbacks[currentState]?.Invoke();
+						if (toolOpeningCallbacks.ContainsKey(currentState))
+							toolOpeningCallbacks[currentState].Invoke();
 						break;
 					}
 				}
@@ -249,7 +263,7 @@ public class ControllerInput : MonoBehaviour
 	void OnScreenshotUpdate()
 	{
 		if (SteamVR_Actions._default.GrabPinch.GetStateDown(inputSource))
-			ScreenCapture.CaptureScreenshot(Application.dataPath + "/StreamingAssets/Screenshots/Screen-" + DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss") + ".jpg");
+			ScreenCapture.CaptureScreenshot(screenshotPath + "Screen-" + DateTime.Now.ToString("yyyy-MM-dd-hh-mm-ss") + ".jpg");
 	}
 
 	void OnSaveUpdate()
@@ -259,23 +273,45 @@ public class ControllerInput : MonoBehaviour
 
 	void OnLoadOpening()
 	{
-		jsonConfigFileNames.Clear();
-		jsonConfigNames.Clear();
-		jsonScreenshotFileNames.Clear();
-		DirectoryInfo dirInfo = new DirectoryInfo(Application.dataPath + "/StreamingAssets/MachineSaves");
+		jsonConfigs.Clear();
+		DirectoryInfo dirInfo = new DirectoryInfo(configPath);
 		FileInfo[] files = dirInfo.GetFiles("*.json");
 		foreach (FileInfo file in files)
 		{
-			jsonConfigFileNames.Add(file.Name);
-			jsonConfigNames.Add(file.Name.Substring(6, file.Name.LastIndexOf('.') - 6));
 			string screenshotFileName = file.Name.Substring(0, file.Name.LastIndexOf('.')) + ".jpg";
-			if (File.Exists(screenshotFileName))
-				jsonScreenshotFileNames.Add(screenshotFileName);
+			JsonConfig jsonConfig = new JsonConfig
+			{
+				fileName = file.Name,
+				name = file.Name.Substring(6, file.Name.LastIndexOf('.') - 6),
+				screenshotName = File.Exists(screenshotFileName) ? screenshotFileName : null
+			};
+			jsonConfigs.Add(jsonConfig);
 		}
+
+		List<JsonConfig> toDisplay = new List<JsonConfig>();
+		int count = 0;
+		for (int i = jsonConfigs.Count - 1; i >= 0; i--)
+		{
+			toDisplay.Add(jsonConfigs[i]);
+			count++;
+			if (count >= 4)
+				break;
+		}
+		SetConfigsOnPanel(toDisplay);
 	}
 
 	void OnLoadUpdate()
 	{
 
+	}
+
+	void SetConfigsOnPanel(List<JsonConfig> toDisplay)
+	{
+		for (int i = 0; i < toDisplay.Count; i++)
+		{
+			if (toDisplay[i].screenshotName != null)
+				loadPanels[i].GetComponentInChildren<Image>().sprite = Resources.Load<Sprite>(configPath + toDisplay[i].screenshotName);
+			loadPanels[i].GetComponentInChildren<Text>().text = toDisplay[i].name;
+		}
 	}
 }
