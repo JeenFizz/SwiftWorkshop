@@ -19959,11 +19959,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: '[CameraRigMultiUser]'
       objectReference: {fileID: 0}
-    - target: {fileID: 934563178472946428, guid: 8461ec6e69f233f4aabda8b7b8318848,
-        type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 934563178473220868, guid: 8461ec6e69f233f4aabda8b7b8318848,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -24454,7 +24449,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3440347366950715177}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -48.7, y: 9.1, z: 28.7}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 3440347366950675213}
@@ -28627,7 +28622,7 @@ PrefabInstance:
     - target: {fileID: 5498798546902598510, guid: 86da20f0cc7e44c47ac227190957c6c0,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5498798546902857450, guid: 86da20f0cc7e44c47ac227190957c6c0,
         type: 3}

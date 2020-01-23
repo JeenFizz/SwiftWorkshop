@@ -608,9 +608,9 @@ MonoBehaviour:
   SteamVRLeft: {fileID: 934563178472924074}
   SteamVRRight: {fileID: 934563178472958348}
   SteamVRCamera: {fileID: 935536801226650368}
-  UserOtherLeftHandModel: {fileID: 100060, guid: 65d8eda911e0ba548a3674f65c43308b,
+  UserOtherLeftHandModel: {fileID: 1000013597184258, guid: 057574477c20401448aba7c848873712,
     type: 3}
-  UserOtherRightHandModel: {fileID: 100060, guid: 641e9d2f5c6b4cb438161abef3be8300,
+  UserOtherRightHandModel: {fileID: 1000010184414672, guid: 5dc81ef5cae96304586abbc6e4b5beb8,
     type: 3}
 --- !u!1 &934563178472958348
 GameObject:

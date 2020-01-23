@@ -5,24 +5,12 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Swift/Scenes/AppConfigJsonReader.unity
-    guid: d1606f5d3b611e54daa1b0973f6ad48b
   - enabled: 1
     path: Assets/Swift/Scenes/LobbyScene.unity
     guid: 19c5d75aad5d70743b959478275b5b72
   - enabled: 1
     path: Assets/Swift/Scenes/SwiftShopLayout.unity
     guid: 5ffe2dd1ab31f344fbefd42b263d33e7
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
-  - enabled: 0
-    path: Assets/Swift/Scenes/multiUserScene.unity
-    guid: 35c1c32980e240c419844c41adf9b21a
   m_configObjects:
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 0d8f0f9adfe90754fb14cecd75ab43f3,
       type: 2}
