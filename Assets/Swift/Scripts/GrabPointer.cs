@@ -165,7 +165,9 @@ public class GrabPointer : MonoBehaviourPunCallbacks
 		{
 			PhotonView grabbedObjectView = targetedObject.GetComponent<PhotonView>();
 			if (grabbedObjectView.Owner != PhotonNetwork.LocalPlayer)
+			{
 				grabbedObjectView.RequestOwnership();
+			}
 
 			grabbedObject = targetedObject;
 			grabbedObject.transform.parent = gameObject.transform;
@@ -208,6 +210,8 @@ public class GrabPointer : MonoBehaviourPunCallbacks
 
 			grabbedObject.GetComponent<Rigidbody>().isKinematic = false;
 			grabbedObject.transform.parent = null;
+			PhotonView grabbedObjectView = targetedObject.GetComponent<PhotonView>();
+			grabbedObjectView.TransferOwnership(0);
 			grabbedObject = null;
 		}
 	}
