@@ -93,20 +93,13 @@ public class MachineLayoutSaver : MonoBehaviour
             foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag))
             {
                 obj.GetComponent<PhotonView>().RequestOwnership();
-                try
-                {
-                    PhotonNetwork.Destroy(obj);
-                }
-                catch (Exception e)
-                {
-                    Debug.Log("sheesh");
-                }
+                PhotonNetwork.Destroy(obj);
             }
 
         foreach (MachineData mData in save.machines)
         {
             string machineName = machines.First(m => m.tag == mData.machineType).prefab.name;
-            GameObject machine = PhotonNetwork.Instantiate(machineName, mData.position, mData.rot);
+            GameObject machine = PhotonNetwork.InstantiateSceneObject(machineName, mData.position, mData.rot);
             machine.tag = mData.machineType;
             machine.name = mData.name.Substring(0, 2);
         }
