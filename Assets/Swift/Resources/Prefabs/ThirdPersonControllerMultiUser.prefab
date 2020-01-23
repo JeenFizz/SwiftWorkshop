@@ -483,6 +483,8 @@ GameObject:
   - component: {fileID: 2294062983036535470}
   - component: {fileID: 6452775796238863411}
   - component: {fileID: 9118059985125823376}
+  - component: {fileID: 8105510842125356252}
+  - component: {fileID: 6890685979047460566}
   m_Layer: 0
   m_Name: ThirdPersonControllerMultiUser
   m_TagString: Untagged
@@ -640,6 +642,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerLocalMat: {fileID: 0}
   GameObjectLocalPlayerColor: {fileID: 0}
+  goFreeLookCameraRig: {fileID: 0}
 --- !u!114 &9118059985125823376
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -682,6 +685,32 @@ MonoBehaviour:
   m_SynchronizeLayers:
   - SynchronizeType: 0
     LayerIndex: 0
+--- !u!114 &8105510842125356252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5498798546902598510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a590eb81b9ba3543a335f239d4246ab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  UI: {fileID: 0}
+--- !u!114 &6890685979047460566
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5498798546902598510}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40f2a98eae5f760469ae27a505b178f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  height: 20
 --- !u!1 &5498798546902600668
 GameObject:
   m_ObjectHideFlags: 0
