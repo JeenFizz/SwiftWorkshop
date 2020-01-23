@@ -51,6 +51,11 @@ public class MachineLayoutSaver : MonoBehaviour
     {
         if (!Input.GetKeyDown("m")) return;
 
+        SaveConfig();
+    }
+
+    public void SaveConfig()
+    {
         IEnumerable<MachineData> machineInfos = machines
             .Aggregate(new List<MachineData>() as IEnumerable<MachineData>, (prev, next) =>
                 prev.Concat(
@@ -79,6 +84,9 @@ public class MachineLayoutSaver : MonoBehaviour
         Debug.Log(saveContent);
 
         File.WriteAllText(path, saveContent);
+
+        path = saveDir + $"/Swift {now.Year}-{now.Month}-{now.Day} {now.Hour}-{now.Minute}-{now.Second}.jpg";
+        ScreenCapture.CaptureScreenshot(path);
     }
 
     void CheckLoad()
