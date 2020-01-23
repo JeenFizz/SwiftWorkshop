@@ -84,7 +84,7 @@ public class ProductFlowChart : MonoBehaviour
         foreach (var product in CurrentProducts)
         {
             GameObject target = GameObject.Find(product.path.First());
-            if (target == null) continue;
+            if (target == null || product.obj == null) continue;
             float step = speed * Time.deltaTime;
             Vector3 targetPos = target.transform.position;
             Vector3 currentPos = product.obj.transform.position;
@@ -97,8 +97,8 @@ public class ProductFlowChart : MonoBehaviour
                 if(product.path.Count == 0)
                 {
                     newList.Remove(product);
-                    product.obj.GetComponent<PhotonView>().RequestOwnership();
-                    Debug.Log(product.obj.GetComponent<PhotonView>().IsMine);
+                    var photonView = product.obj.GetComponent<PhotonView>();
+                    photonView.RequestOwnership();
                     PhotonNetwork.Destroy(product.obj);
                     ProductCountChange(product.type, -1);
                 }

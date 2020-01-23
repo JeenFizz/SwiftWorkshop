@@ -32,6 +32,7 @@ public class MachineLayoutSaver : MonoBehaviour
     }
 
     private string saveDir;
+    private FactorySave save;
 
     // Start is called before the first frame update
     void Start()
@@ -81,19 +82,30 @@ public class MachineLayoutSaver : MonoBehaviour
 
     public void LoadFile(string file)
     {
-        FactorySave save = JsonUtility.FromJson<FactorySave>(File.ReadAllText(file));
+        save = JsonUtility.FromJson<FactorySave>(File.ReadAllText(file));
 
         foreach (string tag in machines.Select(m => m.tag))
             foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag))
             {
-                obj.GetComponent<PhotonView>().RequestOwnership();
+                var pView = obj.GetComponent<PhotonView>();
+                pView.RequestOwnership();
+            }
+
+        Invoke("DeleteMachines", 1);
+    }
+
+    public void DeleteMachines()
+    {
+        foreach (string tag in machines.Select(m => m.tag))
+            foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag))
+            {
                 PhotonNetwork.Destroy(obj);
             }
 
         foreach (MachineData mData in save.machines)
         {
             string machineName = machines.First(m => m.tag == mData.machineType).prefab.name;
-            GameObject machine = PhotonNetwork.InstantiateSceneObject(machineName, mData.position, mData.rot);
+            GameObject machine = PhotonNetwork.Instantiate(machineName, mData.position, mData.rot);
             machine.tag = mData.machineType;
             machine.name = mData.name.Substring(0, 2);
         }
