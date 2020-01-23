@@ -98,6 +98,7 @@ public class ProductFlowChart : MonoBehaviour
                 {
                     newList.Remove(product);
                     product.obj.GetComponent<PhotonView>().RequestOwnership();
+                    Debug.Log(product.obj.GetComponent<PhotonView>().IsMine);
                     PhotonNetwork.Destroy(product.obj);
                     ProductCountChange(product.type, -1);
                 }
@@ -117,7 +118,7 @@ public class ProductFlowChart : MonoBehaviour
 
             if (ProductVisibility[productInfo.name] && machine != null)
             {
-                GameObject productObject = PhotonNetwork.Instantiate("Product", machine.transform.position, new Quaternion());
+                GameObject productObject = PhotonNetwork.InstantiateSceneObject("Product", machine.transform.position, new Quaternion());
                 productObject.GetComponent<MeshRenderer>().material.color = productInfo.color;
 
                 foreach (TextMesh tmesh in productObject.transform.GetComponentsInChildren<TextMesh>()) tmesh.text = productInfo.name;
@@ -135,10 +136,5 @@ public class ProductFlowChart : MonoBehaviour
         var countLabel = ProductInfos.First(p => p.name == name).ui.transform.Find("AmountLabel").GetComponent<Text>();
 
         countLabel.text = (int.Parse(countLabel.text) + offset).ToString();
-    }
-
-    public void SetProductVisibility(string product, bool v)
-    {
-
     }
 }
