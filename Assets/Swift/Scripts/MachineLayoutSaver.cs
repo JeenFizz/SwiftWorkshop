@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using Photon.Realtime;
 
 public class MachineLayoutSaver : MonoBehaviour
 {
@@ -32,7 +33,6 @@ public class MachineLayoutSaver : MonoBehaviour
     }
 
     private string saveDir;
-    private FactorySave save;
 
     // Start is called before the first frame update
     void Start()
@@ -82,23 +82,20 @@ public class MachineLayoutSaver : MonoBehaviour
 
     public void LoadFile(string file)
     {
-        save = JsonUtility.FromJson<FactorySave>(File.ReadAllText(file));
+        var save = JsonUtility.FromJson<FactorySave>(File.ReadAllText(file));
 
         foreach (string tag in machines.Select(m => m.tag))
             foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag))
-            {
-                var pView = obj.GetComponent<PhotonView>();
-                pView.RequestOwnership();
-            }
-
-        Invoke("DeleteMachines", 1);
+                obj.GetComponent<PhotonView>().RPC("PlaceMachines", RpcTarget.MasterClient, save);
     }
 
-    public void DeleteMachines()
+    [PunRPC]
+    public void PlaceMachines(FactorySave save)
     {
         foreach (string tag in machines.Select(m => m.tag))
             foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag))
             {
+                obj.GetComponent<PhotonView>().RequestOwnership();
                 PhotonNetwork.Destroy(obj);
             }
 

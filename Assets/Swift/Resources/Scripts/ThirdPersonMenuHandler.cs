@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class ThirdPersonMenuHandler : MonoBehaviour
 {
-    public GameObject UI;
     private bool showUI = true;
+    public GameObject UI;
     // Start is called before the first frame update
     void Start()
     {
