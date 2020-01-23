@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
 using UnityEngine.UI;
+using Photon.Pun;
 
 public class ProductInfo
 {
@@ -83,6 +84,7 @@ public class ProductFlowChart : MonoBehaviour
         foreach (var product in CurrentProducts)
         {
             GameObject target = GameObject.Find(product.path.First());
+            if (target == null) continue;
             float step = speed * Time.deltaTime;
             Vector3 targetPos = target.transform.position;
             Vector3 currentPos = product.obj.transform.position;
@@ -95,7 +97,8 @@ public class ProductFlowChart : MonoBehaviour
                 if(product.path.Count == 0)
                 {
                     newList.Remove(product);
-                    Destroy(product.obj);
+                    product.obj.GetComponent<PhotonView>().RequestOwnership();
+                    PhotonNetwork.Destroy(product.obj);
                     ProductCountChange(product.type, -1);
                 }
             }
@@ -110,10 +113,11 @@ public class ProductFlowChart : MonoBehaviour
         {
             yield return new WaitForSeconds(5 / productInfo.coef);
 
-            if (ProductVisibility[productInfo.name])
+            GameObject machine = GameObject.Find(productInfo.machines.First());
+
+            if (ProductVisibility[productInfo.name] && machine != null)
             {
-                GameObject machine = GameObject.Find(productInfo.machines.First());
-                GameObject productObject = Instantiate(ProdutObject, machine.transform.position, new Quaternion(), transform);
+                GameObject productObject = PhotonNetwork.Instantiate("Product", machine.transform.position, new Quaternion());
                 productObject.GetComponent<MeshRenderer>().material.color = productInfo.color;
 
                 foreach (TextMesh tmesh in productObject.transform.GetComponentsInChildren<TextMesh>()) tmesh.text = productInfo.name;

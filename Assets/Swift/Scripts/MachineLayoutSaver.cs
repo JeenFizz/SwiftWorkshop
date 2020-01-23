@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Photon.Pun;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -21,6 +22,7 @@ public class MachineLayoutSaver : MonoBehaviour
         public string machineType;
         public Vector3 position;
         public Quaternion rot;
+        public string name;
     }
 
     [Serializable]
@@ -57,7 +59,7 @@ public class MachineLayoutSaver : MonoBehaviour
             .Aggregate(new List<MachineData>() as IEnumerable<MachineData>, (prev, next) =>
                 prev.Concat(
                     GameObject.FindGameObjectsWithTag(next.tag)
-                        .Select(machine => new MachineData() { machineType = next.tag, position = machine.transform.position, rot = machine.transform.rotation })
+                        .Select(machine => new MachineData() { machineType = next.tag, position = machine.transform.position, rot = machine.transform.rotation, name = machine.name })
                 )
             );
 
@@ -89,12 +91,24 @@ public class MachineLayoutSaver : MonoBehaviour
 
         foreach (string tag in machines.Select(m => m.tag))
             foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag))
-                Destroy(obj);
+            {
+                obj.GetComponent<PhotonView>().RequestOwnership();
+                try
+                {
+                    PhotonNetwork.Destroy(obj);
+                }
+                catch (Exception e)
+                {
+                    Debug.Log("sheesh");
+                }
+            }
 
         foreach (MachineData mData in save.machines)
         {
-            GameObject machine = Instantiate(machines.First(m => m.tag == mData.machineType).prefab, mData.position, mData.rot);
+            string machineName = machines.First(m => m.tag == mData.machineType).prefab.name;
+            GameObject machine = PhotonNetwork.Instantiate(machineName, mData.position, mData.rot);
             machine.tag = mData.machineType;
+            machine.name = mData.name.Substring(0, 2);
         }
     }
 }

@@ -23,4 +23,6 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Swift/Scenes/multiUserScene.unity
     guid: 35c1c32980e240c419844c41adf9b21a
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 0d8f0f9adfe90754fb14cecd75ab43f3,
+      type: 2}
