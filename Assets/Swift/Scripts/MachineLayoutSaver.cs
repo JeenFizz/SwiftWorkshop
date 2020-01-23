@@ -95,11 +95,27 @@ public class MachineLayoutSaver : MonoBehaviour
     {
         var save = JsonUtility.FromJson<FactorySave>(File.ReadAllText(file));
 
-        GetComponent<PhotonView>().RPC("PlaceMachines", RpcTarget.MasterClient, save.machines);
+        GetComponent<PhotonView>().RPC("DeleteMachines", RpcTarget.MasterClient);
+
+        foreach (MachineData mData in save.machines)
+            GetComponent<PhotonView>().RPC("PlaceMachine", RpcTarget.MasterClient, mData.machineType, mData.name, mData.position, mData.position);
     }
 
     [PunRPC]
-    public void PlaceMachines(MachineData[] save)
+    public void PlaceMachine(string machineType, float[] position, float[] rot, string name)
+    {
+        string machineName = machines.First(m => m.tag == machineType).prefab.name;
+        GameObject machine = PhotonNetwork.InstantiateSceneObject(
+            machineName, 
+            new Vector3(position[0], position[1], position[2]), 
+            new Quaternion(rot[0], rot[1], rot[2], rot[3])
+        );
+        machine.tag = machineType;
+        machine.name = name.Substring(0, 2);
+    }
+
+    [PunRPC]
+    public void DeleteMachines()
     {
         foreach (string tag in machines.Select(m => m.tag))
             foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag))
@@ -107,17 +123,5 @@ public class MachineLayoutSaver : MonoBehaviour
                 obj.GetComponent<PhotonView>().RequestOwnership();
                 PhotonNetwork.Destroy(obj);
             }
-
-        foreach (MachineData mData in save)
-        {
-            string machineName = machines.First(m => m.tag == mData.machineType).prefab.name;
-            GameObject machine = PhotonNetwork.InstantiateSceneObject(
-                machineName, 
-                new Vector3(mData.position[0], mData.position[1], mData.position[2]), 
-                new Quaternion(mData.rot[0], mData.rot[1], mData.rot[2], mData.rot[3])
-           );
-            machine.tag = mData.machineType;
-            machine.name = mData.name.Substring(0, 2);
-        }
     }
 }
