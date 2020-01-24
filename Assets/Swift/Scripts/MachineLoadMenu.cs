@@ -16,12 +16,17 @@ public class MachineLoadMenu : MonoBehaviour
 
         foreach(string save in Directory.GetFiles(saveDir, "*.json").Reverse())
         {
-            var row = Instantiate(SaveRow, gameObject.transform);
-            row.transform.Find("SaveLabel").GetComponent<UnityEngine.UI.Text>().text = save.Substring(saveDir.Length);
-            row.transform.Find("Load").GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => {
-                GameObject.Find("FactoryMap").GetComponent<MachineLayoutSaver>().LoadFile(save);
-            });
+            AddSaveLine(save);
         }
+    }
+
+    public void AddSaveLine(string save)
+    {
+        var row = Instantiate(SaveRow, gameObject.transform);
+        row.transform.Find("SaveLabel").GetComponent<UnityEngine.UI.Text>().text = save.Substring(saveDir.Length);
+        row.transform.Find("Load").GetComponent<UnityEngine.UI.Button>().onClick.AddListener(() => {
+            GameObject.Find("FactoryMap").GetComponent<MachineLayoutSaver>().LoadFile(save);
+        });
     }
 
     // Update is called once per frame
