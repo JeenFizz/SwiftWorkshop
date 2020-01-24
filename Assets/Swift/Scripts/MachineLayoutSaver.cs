@@ -88,6 +88,9 @@ public class MachineLayoutSaver : MonoBehaviour
 
         File.WriteAllText(path, saveContent);
 
+        var cont = GameObject.Find("Content");
+        if (cont != null) cont.GetComponent<MachineLoadMenu>().AddSaveLine(path);
+
         path = saveDir + $"/Swift {now.Year}-{now.Month}-{now.Day} {now.Hour}-{now.Minute}-{now.Second}.jpg";
         ScreenCapture.CaptureScreenshot(path);
     }
