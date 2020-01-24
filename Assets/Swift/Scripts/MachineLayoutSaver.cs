@@ -106,23 +106,39 @@ public class MachineLayoutSaver : MonoBehaviour
     {
         save = JsonUtility.FromJson<FactorySave>(File.ReadAllText(file));
 
-        GetComponent<PhotonView>().RPC("DeleteMachines", RpcTarget.MasterClient);
+        /*foreach()
+        GetComponent<PhotonView>().RPC("DeleteMachines", RpcTarget.MasterClient);*/
+
+        foreach (MachineData mData in save.machines)
+            GetComponent<PhotonView>().RPC("PlaceMachine", RpcTarget.MasterClient, mData.machineType, mData.position, mData.rot, mData.name);
     }
 
     [PunRPC]
     public void PlaceMachine(string machineType, float[] position, float[] rot, string name)
     {
+        foreach (GameObject obj in GameObject.FindGameObjectsWithTag(name.Substring(0, 2)))
+            PhotonNetwork.Destroy(obj);
+
         string machineName = machines.First(m => m.tag == machineType).prefab.name;
         GameObject machine = PhotonNetwork.InstantiateSceneObject(
             machineName,
-            new Vector3(position[0], position[1], position[2]), 
+            new Vector3(position[0], position[1], position[2]),
             new Quaternion(rot[0], rot[1], rot[2], rot[3])
         );
         machine.tag = machineType;
-        machine.name = name.Substring(0, 2);
+
+        var pView = machine.GetComponent<PhotonView>();
+        pView.RPC("NameMachine", RpcTarget.AllBuffered, pView.ViewID, name.Substring(0, 2));
     }
 
     [PunRPC]
+    public void NameMachine(int viewId, string name)
+    {
+        PhotonView.Find(viewId).transform.name = name;
+    }
+
+
+    /*[PunRPC]
     public void DeleteMachines()
     {
         foreach (string tag in machines.Select(m => m.tag))
@@ -136,7 +152,7 @@ public class MachineLayoutSaver : MonoBehaviour
     private IEnumerator wait(GameObject obj)
     {
         yield return new WaitForSeconds(0.2f);
-    }
+    }*/
 
     public void LoadFileAR()
     {
@@ -146,6 +162,7 @@ public class MachineLayoutSaver : MonoBehaviour
         }
         save = JsonUtility.FromJson<FactorySave>(BetterStreamingAssets.ReadAllText(this.file));
 
-        GetComponent<PhotonView>().RPC("DeleteMachines", RpcTarget.MasterClient);
+        foreach (MachineData mData in save.machines)
+            GetComponent<PhotonView>().RPC("PlaceMachine", RpcTarget.MasterClient, mData.machineType, mData.position, mData.rot, mData.name);
     }
 }
