@@ -115,7 +115,6 @@ public class MachineLayoutSaver : MonoBehaviour
                 return mData;
             }).ToList();
         }
-
         /*foreach (MachineData mData in save.machines)
             GetComponent<PhotonView>().RPC("PlaceMachine", RpcTarget.MasterClient, mData.machineType, mData.position, mData.rot, mData.name);*/
     }
