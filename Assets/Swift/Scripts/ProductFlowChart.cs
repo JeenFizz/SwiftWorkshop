@@ -96,16 +96,23 @@ public class ProductFlowChart : MonoBehaviour
                 product.path.RemoveAt(0);
                 if(product.path.Count == 0)
                 {
+                    var productView = product.obj.GetComponent<PhotonView>();
+                    productView.RPC("DeleteProduct", RpcTarget.MasterClient, productView.ViewID);
                     newList.Remove(product);
-                    var photonView = product.obj.GetComponent<PhotonView>();
-                    photonView.RequestOwnership();
-                    PhotonNetwork.Destroy(product.obj);
                     ProductCountChange(product.type, -1);
                 }
             }
         }
 
         CurrentProducts = newList;
+    }
+
+    [PunRPC]
+    public void DeleteProduct(int viewId)
+    {
+        var view = PhotonView.Find(viewId);
+        view.RequestOwnership();
+        PhotonNetwork.Destroy(view);
     }
 
     public IEnumerator CreateProduct(ProductInfo productInfo)
@@ -118,21 +125,40 @@ public class ProductFlowChart : MonoBehaviour
 
             if (ProductVisibility[productInfo.name] && machine != null)
             {
-                GetComponent<PhotonView>().RPC("SpawnProduct", RpcTarget.MasterClient, productInfo, machine.transform.position);
+                var pos = machine.transform.position;
+                GetComponent<PhotonView>().RPC("SpawnProduct",
+                    RpcTarget.MasterClient,
+                    productInfo.color.r,
+                    productInfo.color.g,
+                    productInfo.color.b,
+                    productInfo.name, 
+                    productInfo.machines.ToArray(),
+                    pos.x,
+                    pos.y,
+                    pos.z
+                );
+                ProductCountChange(productInfo.name, 1);
             }
         }
     }
 
     [PunRPC]
-    public void SpawnProduct(ProductInfo productInfo, Vector3 pos)
+    public void SpawnProduct(float r, float g, float b, string name, string[] machines, float x, float y, float z)
     {
-        GameObject productObject = PhotonNetwork.InstantiateSceneObject("Product", pos, new Quaternion());
-        productObject.GetComponent<MeshRenderer>().material.color = productInfo.color;
+        GameObject productObject = PhotonNetwork.InstantiateSceneObject("Product", new Vector3(){x = x, y = y, z = z}, new Quaternion());
 
-        foreach (TextMesh tmesh in productObject.transform.GetComponentsInChildren<TextMesh>()) tmesh.text = productInfo.name;
+        foreach (TextMesh tmesh in productObject.transform.GetComponentsInChildren<TextMesh>()) tmesh.text = name;
 
-        ProductCountChange(productInfo.name, 1);
-        CurrentProducts.Add((productInfo.machines.ToList(), productObject, productInfo.name));
+        CurrentProducts.Add((machines.ToList(), productObject, name));
+
+        var pView = productObject.GetComponent<PhotonView>();
+        pView.RPC("SetProductColor", RpcTarget.AllBuffered, pView.ViewID, r, g, b);
+    }
+
+    [PunRPC]
+    public void SetProductColor(int viewID, float r, float g, float b)
+    {
+        PhotonView.Find(viewID).transform.GetComponent<MeshRenderer>().material.color = new Color(r, g, b);
     }
 
     private void ProductCountChange(string name, int offset)

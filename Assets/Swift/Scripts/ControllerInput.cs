@@ -80,7 +80,6 @@ public class ControllerInput : MonoBehaviour
 
 		toolUpdateCallbacks.Add(ToolState.Screenshot, OnScreenshotUpdate);
 		toolUpdateCallbacks.Add(ToolState.Save, OnSaveUpdate);
-		toolUpdateCallbacks.Add(ToolState.Load, OnLoadUpdate);
 
 		toolOpeningCallbacks.Add(ToolState.Load, OnLoadOpening);
 
@@ -241,7 +240,8 @@ public class ControllerInput : MonoBehaviour
 		}
 
 		if (currentState != ToolState.None)
-			toolUpdateCallbacks[currentState]?.Invoke();
+			if (toolUpdateCallbacks.ContainsKey(currentState))
+				toolUpdateCallbacks[currentState].Invoke();
 	}
 
 	void TeleportPressed()
@@ -300,13 +300,12 @@ public class ControllerInput : MonoBehaviour
 		foreach (FileInfo file in files)
 		{
 			string screenshotFileName = file.Name.Substring(0, file.Name.LastIndexOf('.')) + ".jpg";
-			JsonConfig jsonConfig = new JsonConfig
+			jsonConfigs.Add(new JsonConfig
 			{
 				fileName = file.Name,
 				name = file.Name.Substring(6, file.Name.LastIndexOf('.') - 6),
 				screenshotName = File.Exists(screenshotFileName) ? screenshotFileName : null
-			};
-			jsonConfigs.Add(jsonConfig);
+			});
 		}
 
 		int count = 0;
@@ -317,11 +316,6 @@ public class ControllerInput : MonoBehaviour
 			if (count >= 4)
 				break;
 		}
-	}
-
-	void OnLoadUpdate()
-	{
-
 	}
 
 	void OnLoadClosing()
