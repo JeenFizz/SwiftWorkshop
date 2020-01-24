@@ -109,8 +109,17 @@ public class MachineLayoutSaver : MonoBehaviour
         /*foreach()
         GetComponent<PhotonView>().RPC("DeleteMachines", RpcTarget.MasterClient);*/
 
-        foreach (MachineData mData in save.machines)
-            GetComponent<PhotonView>().RPC("PlaceMachine", RpcTarget.MasterClient, mData.machineType, mData.position, mData.rot, mData.name);
+        foreach(var machineGroups in save.machines.GroupBy(m => m.machineType))
+        {
+            machineGroups.Select((mData, i) =>
+            {
+                GetComponent<PhotonView>().RPC("PlaceMachine", RpcTarget.MasterClient, mData.machineType, mData.position, mData.rot, mData.machineType + (i + 1).ToString());
+                return mData;
+            });
+        }
+
+        /*foreach (MachineData mData in save.machines)
+            GetComponent<PhotonView>().RPC("PlaceMachine", RpcTarget.MasterClient, mData.machineType, mData.position, mData.rot, mData.name);*/
     }
 
     [PunRPC]
