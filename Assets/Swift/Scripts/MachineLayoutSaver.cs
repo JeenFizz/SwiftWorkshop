@@ -128,15 +128,17 @@ public class MachineLayoutSaver : MonoBehaviour
         );
         machine.tag = machineType;
 
-        var pView = machine.GetComponent<PhotonView>();
-        pView.RPC("NameMachine", RpcTarget.AllBuffered, pView.ViewID, name.Substring(0, 2));
+        /*var pView = machine.GetComponent<PhotonView>();
+        pView.RPC("NameMachine", RpcTarget.All, pView.ViewID, name.Substring(0, 2));*/
+
+        machine.name = name.Substring(0, 2);
     }
 
-    [PunRPC]
+    /*[PunRPC]
     public void NameMachine(int viewId, string name)
     {
         PhotonView.Find(viewId).transform.name = name;
-    }
+    }*/
 
 
     /*[PunRPC]
