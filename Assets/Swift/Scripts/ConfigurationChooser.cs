@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class ConfigurationChooser : MonoBehaviour
@@ -12,7 +14,7 @@ public class ConfigurationChooser : MonoBehaviour
 	private string configPath;
 	private MachineLayoutSaver machineLayoutSaver;
 
-	void Start()
+	void Awake()
 	{
 		path = Application.dataPath + "/StreamingAssets/";
 		configPath = path + "MachineSaves/";
@@ -23,16 +25,47 @@ public class ConfigurationChooser : MonoBehaviour
 	{
 		this.jsonConfig = jsonConfig;
 		if (jsonConfig.screenshotName != null)
-			screenshot.sprite = Resources.Load<Sprite>(configPath + jsonConfig.screenshotName);
+			StartCoroutine(GetTexture());
 		date.text = jsonConfig.name;
+	}
+
+	IEnumerator GetTexture()
+	{
+		using (UnityWebRequest request = UnityWebRequestTexture.GetTexture("file://" + configPath + jsonConfig.screenshotName))
+		{
+			yield return request.SendWebRequest();
+
+			if (!request.isNetworkError && !request.isHttpError)
+			{
+				Texture2D texture = DownloadHandlerTexture.GetContent(request);
+				screenshot.sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+			}
+			else
+				Debug.Log(request.error);
+		}
+	}
+
+	public void ResetJsonConfig()
+	{
+		jsonConfig.fileName = "";
+		jsonConfig.name = "";
+		jsonConfig.screenshotName = "";
+		Destroy(screenshot.sprite);
+		screenshot.sprite = null;
+		date.text = "No configuration";
 	}
 
 	void OnTriggerEnter(Collider other)
 	{
-		if (other.gameObject.CompareTag("InteractionTool"))
+		if (other.gameObject.CompareTag("InteractionTool") && jsonConfig.fileName != null && jsonConfig.fileName.Length > 0)
 		{
 			machineLayoutSaver.LoadFile(configPath + jsonConfig.fileName);
 			done = true;
 		}
+	}
+
+	void OnDestroy()
+	{
+		Destroy(screenshot.sprite);
 	}
 }
