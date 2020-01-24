@@ -109,11 +109,11 @@ public class MachineLayoutSaver : MonoBehaviour
 
         foreach(var machineGroups in save.machines.GroupBy(m => m.machineType))
         {
-            machineGroups.Select((mData, i) =>
+            var g = machineGroups.Select((mData, i) =>
             {
                 GetComponent<PhotonView>().RPC("PlaceMachine", RpcTarget.MasterClient, mData.machineType, mData.position, mData.rot, mData.machineType + (i + 1).ToString());
                 return mData;
-            });
+            }).ToList();
         }
 
         /*foreach (MachineData mData in save.machines)
