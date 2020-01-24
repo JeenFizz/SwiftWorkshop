@@ -151,15 +151,17 @@ public class ProductFlowChart : MonoBehaviour
 
         CurrentProducts.Add((machines.ToList(), productObject, name));
 
-        var pView = productObject.GetComponent<PhotonView>();
-        pView.RPC("SetProductColor", RpcTarget.AllBuffered, pView.ViewID, r, g, b);
+        /*var pView = productObject.GetComponent<PhotonView>();
+        pView.RPC("SetProductColor", RpcTarget.AllBuffered, pView.ViewID, r, g, b);*/
+
+        productObject.transform.GetComponent<MeshRenderer>().material.color = new Color(r, g, b);
     }
 
-    [PunRPC]
+    /*[PunRPC]
     public void SetProductColor(int viewID, float r, float g, float b)
     {
         PhotonView.Find(viewID).transform.GetComponent<MeshRenderer>().material.color = new Color(r, g, b);
-    }
+    }*/
 
     private void ProductCountChange(string name, int offset)
     {
