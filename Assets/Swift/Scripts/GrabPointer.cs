@@ -8,6 +8,7 @@ public class GrabPointer : MonoBehaviourPunCallbacks
 	public GameObject targetedObject;
 	public GameObject grabbedObject;
 	public float pullSpeed = 1f;
+	public bool doNotAllowActions = false;
 
 	private GameObject holder;
 	private GameObject pointer;

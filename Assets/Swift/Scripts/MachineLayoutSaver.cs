@@ -127,11 +127,7 @@ public class MachineLayoutSaver : MonoBehaviour
     {
         foreach (string tag in machines.Select(m => m.tag))
             foreach (GameObject obj in GameObject.FindGameObjectsWithTag(tag))
-            {
-                obj.GetComponent<PhotonView>().RequestOwnership();
-                Thread.Sleep(200);
                 PhotonNetwork.Destroy(obj);
-            }
 
         foreach (MachineData mData in save.machines)
             GetComponent<PhotonView>().RPC("PlaceMachine", RpcTarget.MasterClient, mData.machineType, mData.position, mData.rot, mData.name);
