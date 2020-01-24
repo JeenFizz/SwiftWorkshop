@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 using Valve.VR;
 
@@ -13,7 +14,8 @@ public class ControllerInput : MonoBehaviour
 		None,
 		Screenshot,
 		Save,
-		Load
+		Load,
+		Target
 	}
 
 	public struct JsonConfig
@@ -27,7 +29,8 @@ public class ControllerInput : MonoBehaviour
 	{
 		"Screenshot",
 		"Save",
-		"Load"
+		"Load",
+		"Target"
 	};
 	private int toolIndex = 0;
 
@@ -45,6 +48,7 @@ public class ControllerInput : MonoBehaviour
 	public List<ConfigurationChooser> configurationChoosers;
 	public GrabPointer rightGrabPointer;
 	public GameObject interactionTool;
+	public Image targetConfig;
 
 	private SteamVR_Behaviour_Pose behaviourPose;
 	private SteamVR_Input_Sources inputSource;
@@ -92,6 +96,7 @@ public class ControllerInput : MonoBehaviour
 		toolUpdateCallbacks.Add(ToolState.Load, OnLoadUpdate);
 
 		toolOpeningCallbacks.Add(ToolState.Load, OnLoadOpening);
+		toolOpeningCallbacks.Add(ToolState.Target, OnTargetOpening);
 
 		toolClosingCallbacks.Add(ToolState.Load, OnLoadClosing);
 
@@ -218,6 +223,9 @@ public class ControllerInput : MonoBehaviour
 						break;
 					case 2:
 						currentState = ToolState.Load;
+						break;
+					case 3:
+						currentState = ToolState.Target;
 						break;
 					default:
 						break;
@@ -404,6 +412,27 @@ public class ControllerInput : MonoBehaviour
 		{
 			rightGrabPointer.SetActivePointer(true);
 			rightGrabPointer.doNotAllowActions = false;
+		}
+	}
+
+	void OnTargetOpening()
+	{
+		//StartCoroutine(GetTargetConfigTexture());
+	}
+
+	IEnumerator GetTargetConfigTexture()
+	{
+		using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(""))
+		{
+			yield return request.SendWebRequest();
+
+			if (!request.isNetworkError && !request.isHttpError)
+			{
+				Texture2D texture = DownloadHandlerTexture.GetContent(request);
+				targetConfig.sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+			}
+			else
+				Debug.Log(request.error);
 		}
 	}
 }
