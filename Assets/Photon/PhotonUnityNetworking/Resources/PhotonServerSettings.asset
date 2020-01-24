@@ -30,14 +30,13 @@ MonoBehaviour:
   StartInOfflineMode: 0
   RpcList:
   - ClickRpc
+  - DeleteProduct
   - DestroyRpc
   - DestroySpaceship
   - Fire
-  - RespawnSpaceship
-  - PlaceMachines
-  - SpawnProduct
-  - DeleteMachines
   - PlaceMachine
-  - DeleteProduct
+  - RespawnSpaceship
+  - SpawnProduct
+  - ToggleProducts
   DisableAutoOpenWizard: 1
   ShowSettings: 1

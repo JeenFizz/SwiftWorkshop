@@ -57,7 +57,7 @@ public class ProductFlowChart : MonoBehaviour
             {
                 ProductVisibility[pInfo.name] = !ProductVisibility[pInfo.name];
 
-                if(!ProductVisibility[pInfo.name])
+                /*if(!ProductVisibility[pInfo.name])
                 {
                     foreach (var p in CurrentProducts.Where(p => p.type == pInfo.name))
                     {
@@ -65,9 +65,11 @@ public class ProductFlowChart : MonoBehaviour
                         ProductCountChange(p.type, -1);
                     }
                     CurrentProducts = CurrentProducts.Where(p => p.type != pInfo.name).ToList();
-                }
+                }*/
 
-                pInterface.transform.Find("VisibilityButton").transform.Find("VisibilityLabel").GetComponent<Text>().text = ProductVisibility[pInfo.name] ? "Hide" : "Show";
+                GetComponent<PhotonView>().RPC("ToggleProducts", RpcTarget.MasterClient, pInfo.name);
+
+                //pInterface.transform.Find("VisibilityButton").transform.Find("VisibilityLabel").GetComponent<Text>().text = ProductVisibility[pInfo.name] ? "Toggle" : "Toggle";
             });
             pInterface.transform.Find("PathLabel").GetComponent<Text>().text = pInfo.machines.Aggregate("", (prev, next) => prev + " > " + next);
             pInterface.transform.Find("CoefLabel").GetComponent<Text>().text = pInfo.coef.ToString();
@@ -113,6 +115,22 @@ public class ProductFlowChart : MonoBehaviour
         var view = PhotonView.Find(viewId);
         view.RequestOwnership();
         PhotonNetwork.Destroy(view);
+    }
+
+    [PunRPC]
+    public void ToggleProducts(string type)
+    {
+        if (!ProductVisibility[type])
+        {
+            foreach (var p in CurrentProducts.Where(p => p.type == type))
+            {
+                var view = p.obj.GetComponent<PhotonView>();
+                view.RequestOwnership();
+                PhotonNetwork.Destroy(view);
+                ProductCountChange(p.type, -1);
+            }
+            CurrentProducts = CurrentProducts.Where(p => p.type != type).ToList();
+        }
     }
 
     public IEnumerator CreateProduct(ProductInfo productInfo)
