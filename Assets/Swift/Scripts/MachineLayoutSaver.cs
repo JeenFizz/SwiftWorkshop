@@ -126,7 +126,7 @@ public class MachineLayoutSaver : MonoBehaviour
     [PunRPC]
     public void NameMachine(int viewId, string name)
     {
-        PhotonView.Find(viewId).name = name;
+        PhotonView.Find(viewId).transform.name = name;
     }
 
     [PunRPC]
