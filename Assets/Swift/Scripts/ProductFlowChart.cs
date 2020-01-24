@@ -126,17 +126,27 @@ public class ProductFlowChart : MonoBehaviour
             if (ProductVisibility[productInfo.name] && machine != null)
             {
                 var pos = machine.transform.position;
-                GetComponent<PhotonView>().RPC("SpawnProduct", RpcTarget.MasterClient, productInfo.color, productInfo.name, productInfo.machines.ToArray(), pos.x, pos.y, pos.z);
+                GetComponent<PhotonView>().RPC("SpawnProduct",
+                    RpcTarget.MasterClient,
+                    productInfo.color.r,
+                    productInfo.color.g,
+                    productInfo.color.b,
+                    productInfo.name, 
+                    productInfo.machines.ToArray(),
+                    pos.x,
+                    pos.y,
+                    pos.z
+                );
                 ProductCountChange(productInfo.name, 1);
             }
         }
     }
 
     [PunRPC]
-    public void SpawnProduct(Color color, string name, string[] machines, float x, float y, float z)
+    public void SpawnProduct(float r, float g, float b, string name, string[] machines, float x, float y, float z)
     {
         GameObject productObject = PhotonNetwork.InstantiateSceneObject("Product", new Vector3(){x = x, y = y, z = z}, new Quaternion());
-        productObject.GetComponent<MeshRenderer>().material.color = color;
+        productObject.GetComponent<MeshRenderer>().material.color = new Color(r, g, b);
 
         foreach (TextMesh tmesh in productObject.transform.GetComponentsInChildren<TextMesh>()) tmesh.text = name;
 
