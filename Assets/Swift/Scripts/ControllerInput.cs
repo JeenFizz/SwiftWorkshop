@@ -25,6 +25,11 @@ public class ControllerInput : MonoBehaviour
 		public string screenshotName;
 	}
 
+	public struct TargetConfig
+	{
+		public string fileName;
+	}
+
 	private readonly List<string> toolNames = new List<string>
 	{
 		"Screenshot",
@@ -63,6 +68,7 @@ public class ControllerInput : MonoBehaviour
 	private string path;
 	private string configPath;
 	private string screenshotPath;
+	private string targetConfigPath;
 	private ToolState currentState = ToolState.None;
 	private readonly Dictionary<ToolState, Action> toolUpdateCallbacks = new Dictionary<ToolState, Action>();
 	private readonly Dictionary<ToolState, Action> toolOpeningCallbacks = new Dictionary<ToolState, Action>();
@@ -90,6 +96,7 @@ public class ControllerInput : MonoBehaviour
 		path = Application.dataPath + "/StreamingAssets/";
 		configPath = path + "MachineSaves/";
 		screenshotPath = path + "Screenshots/";
+		targetConfigPath = path + "TargetConfig/";
 
 		toolUpdateCallbacks.Add(ToolState.Screenshot, OnScreenshotUpdate);
 		toolUpdateCallbacks.Add(ToolState.Save, OnSaveUpdate);
@@ -99,6 +106,7 @@ public class ControllerInput : MonoBehaviour
 		toolOpeningCallbacks.Add(ToolState.Target, OnTargetOpening);
 
 		toolClosingCallbacks.Add(ToolState.Load, OnLoadClosing);
+		toolClosingCallbacks.Add(ToolState.Target, OnTargetClosing);
 
 		SetToolNameText();
 		SetToolObjectText(ToolState.Screenshot, screenshotText);
@@ -417,22 +425,33 @@ public class ControllerInput : MonoBehaviour
 
 	void OnTargetOpening()
 	{
-		//StartCoroutine(GetTargetConfigTexture());
+		TargetConfig targetConfig = JsonUtility.FromJson<TargetConfig>(File.ReadAllText(targetConfigPath + "TargetConfig.json"));
+		Debug.Log(targetConfig);
+		StartCoroutine(GetTargetConfigTexture(targetConfig.fileName));
 	}
 
-	IEnumerator GetTargetConfigTexture()
+	IEnumerator GetTargetConfigTexture(string fileName)
 	{
-		using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(""))
+		if (fileName != null && fileName.Length > 0)
 		{
-			yield return request.SendWebRequest();
-
-			if (!request.isNetworkError && !request.isHttpError)
+			using (UnityWebRequest request = UnityWebRequestTexture.GetTexture(path + fileName))
 			{
-				Texture2D texture = DownloadHandlerTexture.GetContent(request);
-				targetConfig.sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+				yield return request.SendWebRequest();
+
+				if (!request.isNetworkError && !request.isHttpError)
+				{
+					Texture2D texture = DownloadHandlerTexture.GetContent(request);
+					targetConfig.sprite = Sprite.Create(texture, new Rect(0.0f, 0.0f, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+				}
+				else
+					Debug.Log(request.error);
 			}
-			else
-				Debug.Log(request.error);
 		}
+	}
+
+	void OnTargetClosing()
+	{
+		Destroy(targetConfig.sprite);
+		targetConfig.sprite = null;
 	}
 }
