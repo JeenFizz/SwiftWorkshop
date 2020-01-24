@@ -99,8 +99,13 @@ public class ProductFlowChart : MonoBehaviour
                 if(product.path.Count == 0)
                 {
                     var productView = product.obj.GetComponent<PhotonView>();
-                    productView.RPC("DeleteProduct", RpcTarget.MasterClient, productView.ViewID);
+                    //productView.RPC("DeleteProduct", RpcTarget.MasterClient, productView.ViewID);
                     newList.Remove(product);
+
+                    /*productView.RequestOwnership();
+                    PhotonNetwork.Destroy(productView);*/
+                    product.obj.SetActive(false);
+
                     ProductCountChange(product.type, -1);
                 }
             }
@@ -109,13 +114,13 @@ public class ProductFlowChart : MonoBehaviour
         CurrentProducts = newList;
     }
 
-    [PunRPC]
+    /*[PunRPC]
     public void DeleteProduct(int viewId)
     {
         var view = PhotonView.Find(viewId);
         view.RequestOwnership();
         PhotonNetwork.Destroy(view);
-    }
+    }*/
 
     [PunRPC]
     public void ToggleProducts(string type)
