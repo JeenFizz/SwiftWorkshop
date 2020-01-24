@@ -118,6 +118,15 @@ public class MachineLayoutSaver : MonoBehaviour
         );
         machine.tag = machineType;
         machine.name = name.Substring(0, 2);
+
+        var pView = machine.GetComponent<PhotonView>();
+        pView.RPC("SetProductColor", RpcTarget.AllBuffered, pView.ViewID, name.Substring(0, 2));
+    }
+
+    [PunRPC]
+    public void NameMachine(int viewId, string name)
+    {
+        PhotonView.Find(viewId).name = name;
     }
 
     [PunRPC]
