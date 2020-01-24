@@ -146,11 +146,19 @@ public class ProductFlowChart : MonoBehaviour
     public void SpawnProduct(float r, float g, float b, string name, string[] machines, float x, float y, float z)
     {
         GameObject productObject = PhotonNetwork.InstantiateSceneObject("Product", new Vector3(){x = x, y = y, z = z}, new Quaternion());
-        productObject.GetComponent<MeshRenderer>().material.color = new Color(r, g, b);
 
         foreach (TextMesh tmesh in productObject.transform.GetComponentsInChildren<TextMesh>()) tmesh.text = name;
 
         CurrentProducts.Add((machines.ToList(), productObject, name));
+
+        var pView = productObject.GetComponent<PhotonView>();
+        pView.RPC("SetProductColor", RpcTarget.AllBuffered, pView.ViewID, r, g, b);
+    }
+
+    [PunRPC]
+    public void SetProductColor(int viewID, float r, float g, float b)
+    {
+        PhotonView.Find(viewID).transform.GetComponent<MeshRenderer>().material.color = new Color(r, g, b);
     }
 
     private void ProductCountChange(string name, int offset)

@@ -112,7 +112,7 @@ public class MachineLayoutSaver : MonoBehaviour
     {
         string machineName = machines.First(m => m.tag == machineType).prefab.name;
         GameObject machine = PhotonNetwork.InstantiateSceneObject(
-            machineName, 
+            machineName,
             new Vector3(position[0], position[1], position[2]), 
             new Quaternion(rot[0], rot[1], rot[2], rot[3])
         );
