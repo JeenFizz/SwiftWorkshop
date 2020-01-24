@@ -116,8 +116,9 @@ public class MachineLayoutSaver : MonoBehaviour
     [PunRPC]
     public void PlaceMachine(string machineType, float[] position, float[] rot, string name)
     {
-        foreach (GameObject obj in GameObject.FindGameObjectsWithTag(name.Substring(0, 2)))
-            PhotonNetwork.Destroy(obj);
+        var delMachine = GameObject.Find(name.Substring(0, 2));
+
+        if(delMachine != null) PhotonNetwork.Destroy(delMachine);
 
         string machineName = machines.First(m => m.tag == machineType).prefab.name;
         GameObject machine = PhotonNetwork.InstantiateSceneObject(
